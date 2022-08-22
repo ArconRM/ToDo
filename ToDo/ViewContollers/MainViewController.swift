@@ -103,6 +103,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             selectedList = lists[indexPath.row]
             performSegue(withIdentifier: "SegueFromMainToItems", sender: nil)
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

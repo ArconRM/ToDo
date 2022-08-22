@@ -25,10 +25,6 @@ class ListItemsViewController: UIViewController {
         createItem(text: "fuckfuckfuck", isDone: false, date: Date.now, list: selectedList)
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        <#code#>
-//    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -39,8 +35,8 @@ class ListItemsViewController: UIViewController {
         ItemsTableView.delegate = self
         ItemsTableView.dataSource = self
         
-        if items.count > 0 {
-            NoItemsLabel.text = ""
+        if items.count == 0 {
+            NoItemsLabel.text = "No tasks :("
         }
     }
     
@@ -78,6 +74,8 @@ class CustomListItemCell: UITableViewCell {
     
     var item = ToDoItem()
     
+    
+    
     @IBOutlet weak var ListItemTextField: UITextField!
     
     @IBAction func ItemIsChanging(_ sender: UITextField) {
@@ -88,6 +86,12 @@ class CustomListItemCell: UITableViewCell {
         } catch {
             fatalError("Error updating ToDoItem")
         }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
     }
 }
 
