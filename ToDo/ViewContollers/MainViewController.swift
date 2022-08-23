@@ -32,13 +32,20 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchAllItems()
-        fetchLists()
+//        fetchAllItems()
+//        fetchLists()
         
         todayTableView.delegate = self
         listsTableView.delegate = self
         todayTableView.dataSource = self
         listsTableView.dataSource = self
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "SegueFromMainToItems") {
+            let vc = segue.destination as! ListItemsViewController
+            vc.selectedList = selectedList
+        }
     }
     
     func fetchAllItems() {
@@ -105,14 +112,6 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             performSegue(withIdentifier: "SegueFromMainToItems", sender: nil)
         }
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if (segue.identifier == "SegueFromMainToItems") {
-            let vc = segue.destination as! ListItemsViewController
-            vc.selectedList = selectedList
-        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

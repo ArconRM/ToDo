@@ -20,21 +20,17 @@ class AddListViewContoller: UIViewController {
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     func createList(name: String) {
-        
-//        if () {
-//            
-//        }
-        
-        var newList = ToDoList(context: context)
-        
-        newList.name = name
-        newList.items = []
-        
-        do {
-            try context.save()
-        } catch {
-            fatalError("Error adding ToDoItem")
+        if (name != "") {
+            var newList = ToDoList(context: context)
+            
+            newList.name = name
+            newList.items = []
+            
+            do {
+                try context.save()
+            } catch {
+                fatalError("Error adding ToDoItem")
+            }
         }
     }
-    
 }

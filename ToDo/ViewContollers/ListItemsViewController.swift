@@ -20,12 +20,12 @@ class ListItemsViewController: UIViewController {
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    
-    @IBAction func AddNewTaskPressed(_ sender: UIButton) {        
-        createItem(text: "fuckfuckfuck", isDone: false, date: Date.now, list: selectedList)
+    override func viewWillAppear(_ animated: Bool) {
+        fetchListItems()
     }
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         
         ListName.text = selectedList.name
@@ -40,6 +40,13 @@ class ListItemsViewController: UIViewController {
         }
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "SegueFromItemsToAddItem") {
+            let vc = segue.destination as! AddToDoItemViewController
+            vc.selectedList = selectedList
+        }
+    }
+    
     func fetchListItems() {
         do {
             items = try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.name == selectedList.name}
@@ -48,22 +55,6 @@ class ListItemsViewController: UIViewController {
             }
         } catch {
             fatalError("Error fetching ToDoItems")
-        }
-    }
-    
-    func createItem(text: String, isDone: Bool, date: Date?, list: ToDoList?) {
-        var newItem = ToDoItem(context: context)
-
-        newItem.text = text
-        newItem.isDone = isDone
-        newItem.dateToRemind = date
-        newItem.list = list
-
-        do {
-            try context.save()
-            fetchListItems()
-        } catch {
-            fatalError("Error adding ToDoItem")
         }
     }
 }
@@ -123,11 +114,6 @@ class CustomListItemCell: UITableViewCell {
 }
 
 extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
-
-//func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//    //Change this according to your needs
-//    return 10
-//}
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
