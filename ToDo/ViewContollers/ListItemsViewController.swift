@@ -75,8 +75,23 @@ class CustomListItemCell: UITableViewCell {
     var item = ToDoItem()
     
     
-    
+    @IBOutlet weak var DoneButton: UIButton!
     @IBOutlet weak var ListItemTextField: UITextField!
+    
+    
+    @IBAction func DoneButtonPressed(_ sender: UIButton) {
+        item.isDone.toggle()
+        
+        do {
+            try context.save()
+        } catch {
+            fatalError("Error updating ToDoItem")
+        }
+        
+        let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
+        
+        DoneButton.setBackgroundImage(image, for: .normal)
+    }
     
     @IBAction func ItemIsChanging(_ sender: UITextField) {
         item.text = sender.text ?? "Error"
@@ -93,9 +108,26 @@ class CustomListItemCell: UITableViewCell {
 
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
     }
+    
+    override var frame: CGRect {
+        get {
+            return super.frame
+        }
+        set (newFrame) {
+            var frame = newFrame
+            frame.origin.y += 3
+            frame.size.height -= 6
+            super.frame = frame
+        }
+    }
 }
 
 extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
+
+//func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//    //Change this according to your needs
+//    return 10
+//}
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -104,10 +136,16 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let item = items[indexPath.row]
+        let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         let cell: CustomListItemCell = self.ItemsTableView.dequeueReusableCell(withIdentifier: cellId) as! CustomListItemCell
+        
         cell.ListItemTextField.text = item.text
+        cell.DoneButton.setBackgroundImage(image, for: .normal)
         cell.item = item
+        
+        cell.layer.borderWidth = 1
+        cell.layer.cornerRadius = 8
         
         return cell
     }

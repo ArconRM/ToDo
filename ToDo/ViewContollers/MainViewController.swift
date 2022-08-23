@@ -26,6 +26,7 @@ class MainViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         fetchAllItems()
+        fetchLists()
     }
 
     override func viewDidLoad() {
