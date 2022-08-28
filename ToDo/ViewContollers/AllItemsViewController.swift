@@ -15,20 +15,21 @@ class AllItemsViewController: UIViewController {
     private var AllItemsTableView: UITableView?
     
     private var items = [ToDoItem]()
-    private let cellId = "allItems"
+    private let cellId = "ToDoItem"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchAllItems()
-        
-        let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
-        let displayWidth: CGFloat = self.view.frame.width
+        let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + 300
+        let displayWidth: CGFloat = self.view.frame.width - 34
         let displayHeight: CGFloat = self.view.frame.height
         
         AllItemsTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
+        
         AllItemsTableView?.backgroundColor = .clear
         AllItemsTableView?.rowHeight = 80
+        AllItemsTableView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        AllItemsTableView?.center = self.view.center
         
         AllItemsTableView!.register(UINib(nibName: "AllItemsTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
         
@@ -37,16 +38,16 @@ class AllItemsViewController: UIViewController {
         self.view.addSubview(AllItemsTableView!)
     }
     
-    func fetchAllItems() {
-        do {
-            items = try context.fetch(ToDoItem.fetchRequest())
-            DispatchQueue.main.async {
-                self.AllItemsTableView!.reloadData()
-            }
-        } catch {
-            fatalError("Error fetching ToDoItems")
-        }
-    }
+//    func fetchAllItems() {
+//        do {
+//            items = try context.fetch(ToDoItem.fetchRequest())
+//            DispatchQueue.main.async {
+//                self.AllItemsTableView!.reloadData()
+//            }
+//        } catch {
+//            fatalError("Error fetching ToDoItems")
+//        }
+//    }
 }
 
 extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {

@@ -15,7 +15,7 @@ class ListItemsViewController: UIViewController {
     @IBOutlet weak var NoItemsLabel: UILabel!
     
     private var items = [ToDoItem]()
-    private let cellId = "listItem"
+    private let cellId = "ToDoItem"
     var selectedList = ToDoList()
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -31,6 +31,8 @@ class ListItemsViewController: UIViewController {
         ListName.text = selectedList.name
         
         fetchListItems()
+        
+        ItemsTableView.register(UINib(nibName: "AllItemsTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
         
         ItemsTableView.delegate = self
         ItemsTableView.dataSource = self
@@ -124,7 +126,7 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
         let item = items[indexPath.row]
         let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
-        let cell: CustomListItemCell = self.ItemsTableView.dequeueReusableCell(withIdentifier: cellId) as! CustomListItemCell
+        let cell: AllItemsTableViewCell = self.ItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! AllItemsTableViewCell
         
         cell.ListItemTextField.text = item.text
         cell.DoneButton.setBackgroundImage(image, for: .normal)
