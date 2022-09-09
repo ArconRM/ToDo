@@ -7,6 +7,7 @@
 
 import UIKit
 
+let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
 class MainViewController: UIViewController {
     
@@ -14,7 +15,6 @@ class MainViewController: UIViewController {
     @IBOutlet weak var listsTableView: UITableView!
     
     private var lists = [ToDoList]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     var allItems = [ToDoItem]()
     

@@ -18,8 +18,6 @@ class ListItemsViewController: UIViewController {
     private let cellId = "ToDoItem"
     var selectedList = ToDoList()
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     override func viewWillAppear(_ animated: Bool) {
         fetchListItems()
     }

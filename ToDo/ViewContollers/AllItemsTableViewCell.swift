@@ -9,12 +9,20 @@ import UIKit
 
 class AllItemsTableViewCell: UITableViewCell {
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     var item = ToDoItem()
     
     @IBOutlet weak var DoneButton: UIButton!
     @IBOutlet weak var ListItemTextField: UITextField!
+    
+    @IBAction func ItemIsChanging(_ sender: UITextField) {
+        item.text = sender.text ?? "Error"
+        
+        do {
+            try context.save()
+        } catch {
+            fatalError("Error updating ToDoItem")
+        }
+    }
     
     @IBAction func DoneButtonPressed(_ sender: UIButton) {
         item.isDone.toggle()
