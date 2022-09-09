@@ -18,39 +18,40 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
     private var listItems = [ToDoItem]() // массив тудушек со списка
     private var lists = [ToDoList]() // массив списков
     
-    private var padding: CGFloat = 000
+    private var padding: CGFloat = 0
     
     private let cellId = "ToDoItem"
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        fetchAllItems()
         fetchLists()
         
         for list in lists {
             allItems.append(fetchListItems(list: list))
         }
         
-        for _ in lists {
+        let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + 400
+        let displayWidth: CGFloat = self.view.frame.width - 34
+        let displayHeight: CGFloat = self.view.frame.height
+        
+        for list in lists {
             
-            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
-                label.center = CGPoint(x: 160, y: padding - 150)
-                label.textAlignment = .left
-                label.text = "I'm a test label"
+            let label = UILabel(frame: CGRect(x: 20, y: barHeight - 270 + padding, width: 200, height: 40))
+            //                label.center = CGPoint(x: 160, y: barHeight - 200 + padding)
+            label.font = .systemFont(ofSize: 30, weight: .bold)
+            label.textColor = .white
+            label.textAlignment = .left
+            label.text = list.name
             
             self.view.addSubview(label)
-            
-            let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + 300
-            let displayWidth: CGFloat = self.view.frame.width - 34
-            let displayHeight: CGFloat = self.view.frame.height
-            
             
             AllItemsTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
             
             AllItemsTableView?.backgroundColor = .clear
             AllItemsTableView?.rowHeight = 80
             AllItemsTableView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            AllItemsTableView?.isScrollEnabled = false
             AllItemsTableView?.center.x = self.view.center.x
             AllItemsTableView?.center.y = self.view.center.y + padding
             
@@ -62,7 +63,8 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
             AllItemsTableView!.delegate = self
             self.view.addSubview(AllItemsTableView!)
             
-            padding += CGFloat(allItems[tableViews.firstIndex(of: AllItemsTableView!) ?? 0].count * 100)
+            padding += CGFloat(allItems[lists.firstIndex(of: list) ?? 0].count * 110)
+            print(padding)
         }
     }
     
@@ -85,16 +87,16 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-//    func fetchAllItems() {
-//        do {
-//            allItems = try context.fetch(ToDoItem.fetchRequest())
-//            DispatchQueue.main.async {
-//                self.AllItemsTableView!.reloadData()
-//            }
-//        } catch {
-//            fatalError("Error fetching ToDoItems")
-//        }
-//    }
+    //    func fetchAllItems() {
+    //        do {
+    //            allItems = try context.fetch(ToDoItem.fetchRequest())
+    //            DispatchQueue.main.async {
+    //                self.AllItemsTableView!.reloadData()
+    //            }
+    //        } catch {
+    //            fatalError("Error fetching ToDoItems")
+    //        }
+    //    }
 }
 
 extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
@@ -118,8 +120,6 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.layer.borderWidth = 1
         cell.layer.cornerRadius = 8
-        
-//        padding += 300
         
         return cell
     }
