@@ -18,7 +18,7 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
     private var listItems = [ToDoItem]() // массив тудушек со списка
     private var lists = [ToDoList]() // массив списков
     
-    private var padding: CGFloat = 300
+    private var padding: CGFloat = 000
     
     private let cellId = "ToDoItem"
 
@@ -34,16 +34,16 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
         
         for _ in lists {
             
-            let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + padding
-            let displayWidth: CGFloat = self.view.frame.width - 34
-            let displayHeight: CGFloat = self.view.frame.height
-            
             let label = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
                 label.center = CGPoint(x: 160, y: padding - 150)
-                label.textAlignment = .center
+                label.textAlignment = .left
                 label.text = "I'm a test label"
             
             self.view.addSubview(label)
+            
+            let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + 300
+            let displayWidth: CGFloat = self.view.frame.width - 34
+            let displayHeight: CGFloat = self.view.frame.height
             
             
             AllItemsTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
@@ -51,7 +51,8 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
             AllItemsTableView?.backgroundColor = .clear
             AllItemsTableView?.rowHeight = 80
             AllItemsTableView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            AllItemsTableView?.center = self.view.center
+            AllItemsTableView?.center.x = self.view.center.x
+            AllItemsTableView?.center.y = self.view.center.y + padding
             
             AllItemsTableView!.register(UINib(nibName: "AllItemsTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
             
