@@ -13,6 +13,7 @@ class AllItemsTableViewCell: UITableViewCell {
     
     @IBOutlet weak var DoneButton: UIButton!
     @IBOutlet weak var ListItemTextField: UITextField!
+    @IBOutlet weak var DateLabel: UILabel!
     
     @IBAction func ItemIsChanging(_ sender: UITextField) {
         item.text = sender.text ?? "Error"

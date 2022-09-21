@@ -10,16 +10,21 @@ import UIKit
 
 class AddToDoItemViewController: UIViewController {
     
+    var selectedList = ToDoList()
+    var selectedDate = Date.now
+    
     @IBOutlet weak var AddTextField: UITextField!
+    @IBOutlet weak var DatePickerView: UIDatePicker!
     
     @IBAction func CreatePressed(_ sender: UIButton) {
-        createItem(text: AddTextField.text ?? "Error", isDone: false, date: Date.now, list: selectedList)
+        createItem(text: AddTextField.text ?? "Error", isDone: false, date: selectedDate, list: selectedList)
         _ = navigationController?.popViewController(animated: true)
     }
     
-    var selectedList = ToDoList()
+    @IBAction func SelectedDate(_ sender: UIDatePicker) {
+        selectedDate = sender.date
+    }
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     func createItem(text: String, isDone: Bool, date: Date?, list: ToDoList?) {
         var newItem = ToDoItem(context: context)

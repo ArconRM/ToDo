@@ -112,10 +112,15 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d, h:mm a"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC+0")
+        
         let cell: AllItemsTableViewCell = self.AllItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! AllItemsTableViewCell
         
         cell.ListItemTextField.text = item.text
         cell.DoneButton.setBackgroundImage(image, for: .normal)
+        cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
         cell.item = item
         
         cell.layer.borderWidth = 1

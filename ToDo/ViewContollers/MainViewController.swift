@@ -9,14 +9,16 @@ import UIKit
 
 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
+var deletedItems = ToDoList()
+
+var allItems = [ToDoItem]()
+
 class MainViewController: UIViewController {
     
     @IBOutlet weak var todayTableView: UITableView!
     @IBOutlet weak var listsTableView: UITableView!
     
     private var lists = [ToDoList]()
-
-    var allItems = [ToDoItem]()
     
     private let todayTableViewIdCell = "todayCell"
     private let listsTableViewIdCell = "listsCell"

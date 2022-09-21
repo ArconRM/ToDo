@@ -14,12 +14,18 @@ class ListItemsViewController: UIViewController {
     @IBOutlet weak var ListName: UILabel!
     @IBOutlet weak var NoItemsLabel: UILabel!
     
-    private var items = [ToDoItem]()
+    private var listItems = [ToDoItem]()
     private let cellId = "ToDoItem"
     var selectedList = ToDoList()
     
     override func viewWillAppear(_ animated: Bool) {
         fetchListItems()
+        
+        if listItems.count == 0 {
+            NoItemsLabel.text = "No tasks :("
+        } else {
+            NoItemsLabel.text = ""
+        }
     }
     
     override func viewDidLoad() {
@@ -34,10 +40,6 @@ class ListItemsViewController: UIViewController {
         
         ItemsTableView.delegate = self
         ItemsTableView.dataSource = self
-        
-        if items.count == 0 {
-            NoItemsLabel.text = "No tasks :("
-        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -49,7 +51,7 @@ class ListItemsViewController: UIViewController {
     
     func fetchListItems() {
         do {
-            items = try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.name == selectedList.name}
+            listItems = try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.name == selectedList.name}
             DispatchQueue.main.async {
                 self.ItemsTableView.reloadData()
             }
@@ -61,10 +63,7 @@ class ListItemsViewController: UIViewController {
 
 class CustomListItemCell: UITableViewCell {
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     var item = ToDoItem()
-    
     
     @IBOutlet weak var DoneButton: UIButton!
     @IBOutlet weak var ListItemTextField: UITextField!
@@ -96,7 +95,7 @@ class CustomListItemCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-
+        
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
     }
     
@@ -116,18 +115,23 @@ class CustomListItemCell: UITableViewCell {
 extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
+        return listItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let item = items[indexPath.row]
+        let item = listItems[indexPath.row]
         let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d, h:mm a"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC+0")
         
         let cell: AllItemsTableViewCell = self.ItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! AllItemsTableViewCell
         
         cell.ListItemTextField.text = item.text
         cell.DoneButton.setBackgroundImage(image, for: .normal)
+        cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
         cell.item = item
         
         cell.layer.borderWidth = 1
