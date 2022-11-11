@@ -8,7 +8,35 @@
 import Foundation
 import UIKit
 
-class AllItemsViewController: UIViewController, UITextFieldDelegate {
+class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollViewDelegate {
+    
+    private let cellId = "ToDoItem"
+    
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.frame = self.view.bounds
+        scrollView.contentSize = contentSize
+        return scrollView
+    }()
+    
+    private lazy var contentView: UIView = {
+        let contentView = UIView()
+        contentView.frame.size = contentSize
+        contentView.center.y = self.view.center.y + 150
+        return contentView
+    }()
+    
+    private let stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 10
+        return stackView
+    }()
+    
+    var contentSize: CGSize {
+        CGSize(width: view.frame.width, height: view.frame.height)
+    }
     
     private var AllItemsTableView: UITableView?
     
@@ -18,33 +46,46 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
     private var listItems = [ToDoItem]() // массив тудушек со списка
     private var lists = [ToDoList]() // массив списков
     
-    private var padding: CGFloat = 0
-    
-    private let cellId = "ToDoItem"
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubview(stackView)
+        scrollView.layer.zPosition = -1
+        
         fetchLists()
+        fetchAllListItems(lists: lists)
         
-        for list in lists {
-            allItems.append(fetchListItems(list: list))
+        if Double(lists.count * 55 + allItems.count * 1) > view.frame.height {
+            scrollView.contentSize = CGSize(width: view.frame.width, height: Double(lists.count * 55 + allItems.count * 1) + view.frame.height)
+            stackView.frame.size = CGSize(width: view.frame.width, height: Double(lists.count * 55 + allItems.count * 1) + view.frame.height)
+        } else {
+            scrollView.contentSize = CGSize(width: view.frame.width, height: view.frame.height)
+            stackView.frame.size = CGSize(width: view.frame.width, height: view.frame.height)
         }
-        
+                
         let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + 400
-        let displayWidth: CGFloat = self.view.frame.width - 34
+        let displayWidth: CGFloat = self.view.frame.width
         let displayHeight: CGFloat = self.view.frame.height
+        
+        var index = 0
         
         for list in lists {
             
-            let label = UILabel(frame: CGRect(x: 20, y: barHeight - 270 + padding, width: 200, height: 40))
-            //                label.center = CGPoint(x: 160, y: barHeight - 200 + padding)
+            let label = UILabel(frame: CGRect(x: 20, y: barHeight - 270, width: 200, height: 40))
             label.font = .systemFont(ofSize: 30, weight: .bold)
             label.textColor = .white
             label.textAlignment = .left
             label.text = list.name
+            label.translatesAutoresizingMaskIntoConstraints = false
             
-            self.view.addSubview(label)
+            NSLayoutConstraint.activate([
+                label.widthAnchor.constraint(equalToConstant: displayWidth - 20),
+                label.heightAnchor.constraint(equalToConstant: 30),
+            ])
+            
+            stackView.addArrangedSubview(label)
             
             AllItemsTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
             
@@ -53,50 +94,62 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate {
             AllItemsTableView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             AllItemsTableView?.isScrollEnabled = false
             AllItemsTableView?.center.x = self.view.center.x
-            AllItemsTableView?.center.y = self.view.center.y + padding
+            AllItemsTableView?.translatesAutoresizingMaskIntoConstraints = false
             
             AllItemsTableView!.register(UINib(nibName: "AllItemsTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
             
-            tableViews.append(AllItemsTableView!)
+            tableViews.append(AllItemsTableView ?? UITableView())
             
             AllItemsTableView!.dataSource = self
             AllItemsTableView!.delegate = self
-            self.view.addSubview(AllItemsTableView!)
-            
-            padding += CGFloat(allItems[lists.firstIndex(of: list) ?? 0].count * 110)
-            print(padding)
+//
+            NSLayoutConstraint.activate([
+                AllItemsTableView!.widthAnchor.constraint(equalToConstant: displayWidth - 20),
+                AllItemsTableView!.heightAnchor.constraint(equalToConstant: CGFloat(allItems[index].count * 100)),
+            ])
+            index += 1
+//
+            stackView.addArrangedSubview(AllItemsTableView ?? UITableView())
         }
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            stackView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            stackView.leftAnchor.constraint(equalTo: contentView.leftAnchor)
+        ])
     }
+    
+//    func setupScrollView(){
+//        view.addSubview(scrollView)
+//
+//        scrollView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//        scrollView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+//        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+//        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+//    }
+    
     
     func fetchLists() {
         do {
             lists = try context.fetch(ToDoList.fetchRequest())
             DispatchQueue.main.async {
-                self.AllItemsTableView!.reloadData()
+                self.AllItemsTableView?.reloadData()
             }
         } catch {
             fatalError("Error fetching lists")
         }
     }
     
-    func fetchListItems(list: ToDoList) -> [ToDoItem] {
+    func fetchAllListItems(lists: [ToDoList]) {
         do {
-            return try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.name == list.name}
+            for list in lists {
+                self.allItems.append(try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.name == list.name})
+            }
         } catch {
             fatalError("Error fetching ListItems")
         }
     }
-    
-    //    func fetchAllItems() {
-    //        do {
-    //            allItems = try context.fetch(ToDoItem.fetchRequest())
-    //            DispatchQueue.main.async {
-    //                self.AllItemsTableView!.reloadData()
-    //            }
-    //        } catch {
-    //            fatalError("Error fetching ToDoItems")
-    //        }
-    //    }
 }
 
 extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {

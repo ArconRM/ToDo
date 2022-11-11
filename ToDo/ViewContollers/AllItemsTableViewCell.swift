@@ -15,6 +15,8 @@ class AllItemsTableViewCell: UITableViewCell {
     @IBOutlet weak var ListItemTextField: UITextField!
     @IBOutlet weak var DateLabel: UILabel!
     
+    @IBOutlet weak var Item: UIView!
+    
     @IBAction func ItemIsChanging(_ sender: UITextField) {
         item.text = sender.text ?? "Error"
         
@@ -37,6 +39,10 @@ class AllItemsTableViewCell: UITableViewCell {
         let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         DoneButton.setBackgroundImage(image, for: .normal)
+        
+        ListItemTextField.backgroundColor = item.isDone ? .gray : .white
+        Item.backgroundColor = item.isDone ? .gray : .white
+        self.backgroundColor = item.isDone ? .gray : .white
     }
     
     override func layoutSubviews() {

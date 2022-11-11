@@ -78,7 +78,7 @@ class CustomListItemCell: UITableViewCell {
             fatalError("Error updating ToDoItem")
         }
         
-        let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
+        let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         DoneButton.setBackgroundImage(image, for: .normal)
     }
