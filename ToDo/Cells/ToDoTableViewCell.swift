@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AllItemsTableViewCell: UITableViewCell {
+class ToDoTableViewCell: UITableViewCell {
     
     var item = ToDoItem()
     
