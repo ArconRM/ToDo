@@ -10,22 +10,13 @@ import UIKit
 class ToDoTableViewCell: UITableViewCell {
     
     var item = ToDoItem()
+    private let notificationCenter = UNUserNotificationCenter.current()
     
     @IBOutlet weak var DoneButton: UIButton!
-    @IBOutlet weak var ListItemTextField: UITextField!
+    @IBOutlet weak var ToDoItemLabel: UILabel!
     @IBOutlet weak var DateLabel: UILabel!
     
     @IBOutlet weak var Item: UIView!
-    
-    @IBAction func ItemIsChanging(_ sender: UITextField) {
-        item.text = sender.text ?? "Error"
-        
-        do {
-            try context.save()
-        } catch {
-            fatalError("Error updating ToDoItem")
-        }
-    }
     
     @IBAction func DoneButtonPressed(_ sender: UIButton) {
         item.isDone.toggle()
@@ -36,13 +27,39 @@ class ToDoTableViewCell: UITableViewCell {
             fatalError("Error updating ToDoItem")
         }
         
+        if !item.isDone {
+            createNotification(title: item.list?.name ?? "Error", body: item.text ?? "Error", id: item.notificationId!)
+        } else {
+            notificationCenter.removePendingNotificationRequests(withIdentifiers: [item.notificationId!.uuidString])
+        }
+        
         let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         DoneButton.setBackgroundImage(image, for: .normal)
-        
-        ListItemTextField.backgroundColor = item.isDone ? .gray : .white
-        Item.backgroundColor = item.isDone ? .gray : .white
-        self.backgroundColor = item.isDone ? .gray : .white
+    }
+    
+    func createNotification(title: String, body: String, id: UUID) {
+        notificationCenter.getNotificationSettings { (settings) in
+            if (settings.authorizationStatus == .authorized) {
+                
+                let content  = UNMutableNotificationContent()
+                content.title = title
+                content.body = body
+                content.sound = UNNotificationSound.default
+                
+                let date = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: self.item.dateToRemind ?? Date.now)
+                let trigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: false)
+                    
+                let request = UNNotificationRequest(identifier: id.uuidString, content: content, trigger: trigger)
+                
+                self.notificationCenter.add(request) { (error) in
+                    if error != nil {
+                        print(error?.localizedDescription ?? "Unknown error")
+                        return
+                    }
+                }
+            }
+        }
     }
     
     override func layoutSubviews() {

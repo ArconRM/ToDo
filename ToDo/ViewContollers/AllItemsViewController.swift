@@ -20,7 +20,7 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        scrollView.frame = CGRect(x: 0, y: 0.154 * UIScreen.main.bounds.height, width: self.view.bounds.width, height: self.view.bounds.height * 0.846)
+        scrollView.frame = CGRect(x: 0, y: ViewHeader.frame.height, width: self.view.bounds.width, height: self.view.bounds.height - ViewHeader.frame.height)
         scrollView.contentSize = contentSize
         return scrollView
     }()
@@ -28,7 +28,6 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     private lazy var contentView: UIView = {
         let contentView = UIView()
         contentView.frame.size = contentSize
-//        contentView.center.y =
         return contentView
     }()
     
@@ -64,10 +63,11 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
         var index = 0
         
         for list in lists {
-            
-            if (itemsByList[index].count == 0) {
-                continue
-            }
+//
+//            if (itemsByList[index].count == 0) {
+//                index += 1
+//                continue
+//            }
             
             let label = UILabel(frame: CGRect(x: 20, y: barHeight - 270, width: 200, height: 40))
             label.font = .systemFont(ofSize: 30, weight: .bold)
@@ -81,7 +81,9 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
                 label.heightAnchor.constraint(equalToConstant: 40),
             ])
             
-            stackView.addArrangedSubview(label)
+            if itemsByList[index].count > 0 {
+                stackView.addArrangedSubview(label)
+            }
             
             AllItemsTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
             AllItemsTableView?.backgroundColor = .clear
@@ -96,12 +98,14 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             AllItemsTableView!.delegate = self
             
             NSLayoutConstraint.activate([
-                AllItemsTableView!.widthAnchor.constraint(equalToConstant: displayWidth - 20),
+                AllItemsTableView!.widthAnchor.constraint(equalToConstant: displayWidth - 25),
                 AllItemsTableView!.heightAnchor.constraint(equalToConstant: CGFloat(itemsByList[index].count * 80)),
             ])
-            index += 1
             
-            stackView.addArrangedSubview(AllItemsTableView ?? UITableView())
+            if itemsByList[index].count > 0 {
+                stackView.addArrangedSubview(AllItemsTableView ?? UITableView())
+            }
+            index += 1
         }
     }
 }
@@ -127,21 +131,39 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         let items = itemsByList[tableViews.firstIndex(of: tableView) ?? 0]
         let item = items[indexPath.row]
         
-        let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
+        let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, h:mm a"
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC+0")
+        dateFormatter.timeZone = TimeZone.current
         
         let cell: ToDoTableViewCell = self.AllItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! ToDoTableViewCell
         
-        cell.ListItemTextField.text = item.text
+        cell.ToDoItemLabel.text = item.text
         cell.DoneButton.setBackgroundImage(image, for: .normal)
         cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
         cell.item = item
         
-        cell.layer.borderWidth = 1
-        cell.layer.cornerRadius = 8
+        let cellSize = CGSize(width: UIScreen.main.bounds.width - 25, height: cell.bounds.height)
+        
+        let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
+        
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
+        shapeLayer.path = maskPath.cgPath
+        cell.layer.mask = shapeLayer
+        
+        let borderLayer = CAShapeLayer()
+        borderLayer.path = maskPath.cgPath
+        borderLayer.fillColor = UIColor.clear.cgColor
+        borderLayer.strokeColor = UIColor.black.cgColor
+        borderLayer.lineWidth = 4
+        borderLayer.frame = cell.bounds
+        cell.layer.addSublayer(borderLayer)
+        
+        
+//        cell.layer.borderWidth = 1
+//        cell.layer.cornerRadius = 8
         
         return cell
     }

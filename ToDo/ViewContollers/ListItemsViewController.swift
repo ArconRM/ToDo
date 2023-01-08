@@ -8,18 +8,22 @@
 import Foundation
 import UIKit
 
-class ListItemsViewController: UIViewController {
+class ListItemsViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var ItemsTableView: UITableView!
-    @IBOutlet weak var ListName: UILabel!
+    @IBOutlet weak var AddButton: UIButton!
+    @IBOutlet weak var ListNameTextField: UITextField!
     
     private var listItems = [ToDoItem]()
     private let cellId = "ToDoItem"
     var selectedList = ToDoList()
+    var selectedItem = ToDoItem()
     
     let NoItemsLabel = UILabel.init()
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        fetchToDoItems()
         fetchListItems()
         
         if listItems.count == 0 {
@@ -37,94 +41,125 @@ class ListItemsViewController: UIViewController {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+        ListNameTextField.resignFirstResponder()
     }
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         
-        ListName.text = selectedList.name
-        
-        fetchListItems()
+        ListNameTextField.delegate = self
+        ListNameTextField.text = selectedList.name
         
         ItemsTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
         
         ItemsTableView.delegate = self
         ItemsTableView.dataSource = self
+        
+        if selectedList.name == "Completed" {
+            AddButton.removeFromSuperview()
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "SegueFromItemsToAddItem") {
             let vc = segue.destination as! AddToDoItemViewController
             vc.selectedList = selectedList
+            vc.status = .add
+        } else if (segue.identifier == "SegueFromItemsToUpdateItem") {
+            let vc = segue.destination as! AddToDoItemViewController
+            vc.selectedList = selectedList
+            vc.selectedItem = selectedItem
+            vc.status = .update
         }
     }
     
     func fetchListItems() {
         do {
-            listItems = try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.name == selectedList.name}
+            if selectedList.name == "Completed" {
+                listItems = allItems.filter {$0.isDone == true}
+            } else {
+                listItems = allItems.filter {$0.list?.id == selectedList.id}
+            }
             DispatchQueue.main.async {
                 self.ItemsTableView.reloadData()
             }
+        }
+    }
+
+    func deleteItem(toDoItem: ToDoItem) {
+        context.delete(toDoItem)
+        do {
+            DispatchQueue.main.async {
+                self.ItemsTableView.reloadData()
+            }
+            try context.save()
         } catch {
-            fatalError("Error fetching ToDoItems")
+            fatalError("Error deleting ToDoItem")
+        }
+    }
+    
+    @IBAction func ListNameBeganChanging(_ sender: UITextField) {
+        if selectedList.name == "Completed" {
+            let alert = UIAlertController(title: "Forbidden", message: "You can't change this list name.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    @IBAction func ListNameEndedChanging(_ sender: UITextField) {
+        if sender.text != "" && !lists.contains(where: {$0.name == sender.text}) && sender.text!.count <= 20 {
+            selectedList.name = sender.text
+            
+            do {
+                try context.save()
+            } catch {
+                fatalError("Error updating ToDoItem")
+            }
+            
+        } else {
+            let alert = UIAlertController(title: "Incorrect list name", message: "List name must be unique and contain from 1 to 20 symbols.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    @IBAction func DeleteListPressed(_ sender: Any) {
+        if selectedList.name == "Completed" {
+            let alert = UIAlertController(title: "Forbidden", message: "You can't delete this list.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            let alert = UIAlertController(title: "Are you sure?", message: "You are going to delete this list.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { action in
+                do {
+                    for item in self.selectedList.items?.allObjects as! [ToDoItem] {
+                        context.delete(item)
+                    }
+                    context.delete(self.selectedList)
+                    try context.save()
+                    
+                    let _ = self.navigationController?.popToRootViewController(animated: true)
+                }
+                catch {
+                    fatalError("Error deleting list and it's items.")
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "No", style: .cancel))
+            self.present(alert, animated: true, completion: nil)
         }
     }
 }
 
-//class CustomListItemCell: UITableViewCell {
-//
-//    var item = ToDoItem()
-//
-//    @IBOutlet weak var DoneButton: UIButton!
-//    @IBOutlet weak var ListItemTextField: UITextField!
-//
-//
-//    @IBAction func DoneButtonPressed(_ sender: UIButton) {
-//        item.isDone.toggle()
-//
-//        do {
-//            try context.save()
-//        } catch {
-//            fatalError("Error updating ToDoItem")
-//        }
-//
-//        let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
-//
-//        DoneButton.setBackgroundImage(image, for: .normal)
-//    }
-//
-//    @IBAction func ItemIsChanging(_ sender: UITextField) {
-//        item.text = sender.text ?? "Error"
-//
-//        do {
-//            try context.save()
-//        } catch {
-//            fatalError("Error updating ToDoItem")
-//        }
-//    }
-//
-//    override func layoutSubviews() {
-//        super.layoutSubviews()
-//
-//        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
-//    }
-//
-//    override var frame: CGRect {
-//        get {
-//            return super.frame
-//        }
-//        set (newFrame) {
-//            var frame = newFrame
-//            frame.origin.y += 3		
-//            frame.size.height -= 6
-//            super.frame = frame
-//        }
-//    }
-//}
-
 extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if selectedList.name != "Completed" {
+            selectedItem = listItems[indexPath.row]
+            performSegue(withIdentifier: "SegueFromItemsToUpdateItem", sender: nil)
+            
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return listItems.count
@@ -137,19 +172,54 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, h:mm a"
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC+0")
+        dateFormatter.timeZone = TimeZone.current
         
         let cell: ToDoTableViewCell = self.ItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! ToDoTableViewCell
         
-        cell.ListItemTextField.text = item.text
+        cell.ToDoItemLabel.text = item.text
         cell.DoneButton.setBackgroundImage(image, for: .normal)
         cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
         cell.item = item
         
-        cell.layer.borderWidth = 1
-        cell.layer.cornerRadius = 8
+        let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: cell.bounds.height)
+        
+        let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
+        
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
+        shapeLayer.path = maskPath.cgPath
+        cell.layer.mask = shapeLayer
+        
+        let borderLayer = CAShapeLayer()
+        borderLayer.path = maskPath.cgPath
+        borderLayer.fillColor = UIColor.clear.cgColor
+        borderLayer.strokeColor = UIColor.black.cgColor
+        borderLayer.lineWidth = 4
+        borderLayer.frame = cell.bounds
+        cell.layer.addSublayer(borderLayer)
+        
+//        cell.layer.borderWidth = 1 // сбрасывается при свайпе
         
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") {
+            (action, sourceView, completionHandler) in
+            self.deleteItem(toDoItem: self.listItems[indexPath.row])
+            fetchToDoItems()
+            self.fetchListItems()
+            completionHandler(true)
+        }
+        deleteAction.image = UIImage(systemName: "trash.fill")
+        let swipeConfiguration = UISwipeActionsConfiguration(actions: [deleteAction])
+        
+        swipeConfiguration.performsFirstActionWithFullSwipe = false
+        
+        return swipeConfiguration
+        
+    }
+    
 }
 

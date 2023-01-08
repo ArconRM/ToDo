@@ -8,11 +8,12 @@
 import UIKit
 import CoreData
 
+
+let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if #available(iOS 15.0, *) {
             let navigationBarAppearance = UINavigationBarAppearance()

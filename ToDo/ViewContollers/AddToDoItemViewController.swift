@@ -9,31 +9,73 @@ import Foundation
 import UIKit
 import UserNotifications
 
-class AddToDoItemViewController: UIViewController {
+class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     
+    enum Status: String {
+        case unknown = "Error"
+        case add = "Add"
+        case update = "Update"
+    }
+    
+    var selectedItem = ToDoItem()
     var selectedList = ToDoList()
-    var selectedDate = Date.now
+    private var selectedDate = Date.now
+    private var notificationId = UUID()
+    var status = Status.unknown
     
-    let notificationCenter = UNUserNotificationCenter.current()
+    private let notificationCenter = UNUserNotificationCenter.current()
 
-    @IBOutlet weak var AddTextField: UITextField!
+    @IBOutlet weak var ToDoItemTextField: UITextField!
+    @IBOutlet weak var ActionButton: UIButton!
     @IBOutlet weak var DatePickerView: UIDatePicker!
     
-    @IBAction func CreatePressed(_ sender: UIButton) {
-        createItem(text: AddTextField.text ?? "Error", date: selectedDate, list: selectedList)
+    @IBAction func ButtonPressed(_ sender: UIButton) {
+        switch status {
+        case .add:
+            ActionButton.setTitle("Create", for: .normal)
+            createItem(text: ToDoItemTextField.text ?? "Error", date: selectedDate, list: selectedList)
+        case .update:
+            ActionButton.setTitle("Update", for: .normal)
+            updateItem(toDoItem: selectedItem, newText: ToDoItemTextField.text ?? "Error", newDate: selectedDate, notificationId: notificationId)
+        default:
+            return
+        }
         _ = navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func SelectedDate(_ sender: UIDatePicker) {
+    @IBAction func DidSelectDate(_ sender: UIDatePicker) {
         selectedDate = sender.date
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+        ToDoItemTextField.resignFirstResponder()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        ToDoItemTextField.resignFirstResponder()
+        return true
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        ToDoItemTextField.delegate = self
+        ToDoItemTextField.attributedPlaceholder = NSAttributedString(
+            string: "Enter task",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.black]
+        )
+        
+        DatePickerView.locale = Locale.current
+        
+        if status == .update {
+            ToDoItemTextField.text = selectedItem.text
+            DatePickerView.date = selectedItem.dateToRemind ?? Date.now
+        }
+        
+        ActionButton.setTitle(status.rawValue, for: .normal)
+//        ActionButton.titleLabel!.font = UIFont(name: "ArialRoundedMTBold", size: 24)
+        
+//        print(Locale.current)
         
         notificationCenter.requestAuthorization(options: [.alert, .sound]) { (permissionGranted, error) in
             if(!permissionGranted)
@@ -43,30 +85,55 @@ class AddToDoItemViewController: UIViewController {
         }
     }
     
-    func createItem(text: String, date: Date?, list: ToDoList?) {
-        if text == "" || text.count > 20 {
-            let alert = UIAlertController(title: "Incorrect list name", message: "List name must contain from 1 to 20 symbols.", preferredStyle: .alert)
+    func updateItem(toDoItem: ToDoItem, newText: String, newDate: Date?, notificationId: UUID) {
+        if newText == "" {
+            let alert = UIAlertController(title: "Incorrect ToDo", message: "ToDo can't be empty.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self.present(alert, animated: true, completion: nil)
         } else {
-            let newItem = ToDoItem(context: context)
+            toDoItem.text = newText
+            toDoItem.dateToRemind = newDate
+            toDoItem.notificationId = notificationId
             
-            newItem.text = text
-            newItem.isDone = false
-            newItem.dateToRemind = date
-            newItem.list = list
+            createNotification(title: toDoItem.list?.name ?? "Error", body: newText, id: notificationId)
             
             do {
                 try context.save()
             } catch {
-                fatalError("Error adding ToDoItem")
+                fatalError("Error updating ToDoItem")
             }
-            
-            createNotification(title: list?.name ?? "Error", body: text)
         }
     }
     
-    func createNotification(title: String, body: String) {
+    func createItem(text: String, date: Date, list: ToDoList) {
+        if text == "" {
+            let alert = UIAlertController(title: "Empty field", message: "ToDo can't be empty.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            do {
+                let newItem = ToDoItem(context: context)
+                
+                newItem.text = text
+                newItem.isDone = false
+                newItem.dateToRemind = date
+                newItem.list = list
+                newItem.notificationId = notificationId
+                
+                var array = list.items?.allObjects
+                array?.append(newItem)
+                list.items = NSSet(array: array ?? [])
+                
+                createNotification(title: list.name ?? "Error", body: text, id: notificationId)
+                
+                try context.save()
+            } catch {
+                fatalError("Error adding ToDoItem")
+            }
+        }
+    }
+    
+    func createNotification(title: String, body: String, id: UUID) {
         notificationCenter.getNotificationSettings { (settings) in
             if (settings.authorizationStatus == .authorized) {
                 
@@ -78,14 +145,13 @@ class AddToDoItemViewController: UIViewController {
                 let date = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: self.selectedDate)
                 let trigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: false)
                     
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                let request = UNNotificationRequest(identifier: id.uuidString, content: content, trigger: trigger)
                 
                 self.notificationCenter.add(request) { (error) in
                     if error != nil {
                         print(error?.localizedDescription ?? "Unknown error")
                         return
                     }
-                    
                 }
             }
         }

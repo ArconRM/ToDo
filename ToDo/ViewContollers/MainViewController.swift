@@ -7,12 +7,35 @@
 
 import UIKit
 
+// общее
 let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
-var deletedItems = ToDoList() // массивых выполненных элементов
 var allItems = [ToDoItem]() // массив всех тудушек
 var lists = [ToDoList]() // массив листов
 var itemsByList = [[ToDoItem]]() // массив массивов тудушек по листам
+
+func fetchToDoItems() {
+    do {
+        allItems = try context.fetch(ToDoItem.fetchRequest())
+        
+        lists = try context.fetch(ToDoList.fetchRequest())
+        lists.removeAll {$0.name == "Completed"}
+        
+        if allItems.filter({$0.isDone == true}).count > 0 {
+            var completedItems = ToDoList(context: context)
+            completedItems.name = "Completed"
+            lists.append(completedItems)
+        }
+        
+        itemsByList = []
+        for list in lists {
+            itemsByList.append(allItems.filter {$0.list?.id == list.id})
+        }
+    } catch {
+        fatalError("Error fetching ToDo items")
+    }
+}
+// общее
 
 class MainViewController: UIViewController {
     
@@ -29,12 +52,11 @@ class MainViewController: UIViewController {
     let NoListsLabel = UILabel.init()
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchAllItems()
+        fetchToDoItems()
         getTodayItems()
-        fetchLists()
-        fetchAllListsItems()
         
         DispatchQueue.main.async {
+            self.TodayTableView.reloadData()
             self.ListsTableView.reloadData()
         }
         
@@ -88,75 +110,12 @@ class MainViewController: UIViewController {
         }
     }
     
-    func fetchAllItems() {
-        do {
-            allItems = try context.fetch(ToDoItem.fetchRequest())
-            DispatchQueue.main.async {
-                self.TodayTableView.reloadData()
-                self.ListsTableView.reloadData()
-            }
-        } catch {
-            fatalError("Error fetching ToDoItems")
-        }
-    }
-    
     func getTodayItems() {
+        todayItems = []
         for item in allItems {
-            if Calendar.current.dateComponents([.day], from: item.dateToRemind ?? Date.distantPast) == Calendar.current.dateComponents([.day], from: Date.now) && !todayItems.contains(item) {
+            if Calendar.current.dateComponents([.day], from: item.dateToRemind ?? Date.distantPast) == Calendar.current.dateComponents([.day], from: Date.now) && item.isDone == false {
                 todayItems.append(item)
             }
-        }
-    }
-    
-    func fetchLists() {
-        do {
-            lists = try context.fetch(ToDoList.fetchRequest())
-            DispatchQueue.main.async {
-                self.ListsTableView.reloadData()
-            }
-        } catch {
-            fatalError("Error fetching lists")
-        }
-    }
-    
-    func fetchAllListsItems() {
-        do {
-            itemsByList = []
-            for list in lists {
-                itemsByList.append(try context.fetch(ToDoItem.fetchRequest()).filter {$0.list?.id == list.id})
-            }
-            DispatchQueue.main.async {
-                self.TodayTableView.reloadData()
-                self.ListsTableView.reloadData()
-            }
-        } catch {
-            fatalError("Error fetching ListItems")
-        }
-    }
-
-    func deleteItem(toDoItem: ToDoItem) {
-        context.delete(toDoItem)
-        do {
-            DispatchQueue.main.async {
-                self.TodayTableView.reloadData()
-                self.ListsTableView.reloadData()
-            }
-            try context.save()
-        } catch {
-            fatalError("Error deleting ToDoItem")
-        }
-    }
-
-    func changeItem(toDoItem: ToDoItem, newText: String, newIsDone: Bool, newDate: Date?, newList: ToDoList?) {
-        toDoItem.text = newText
-        toDoItem.isDone = newIsDone
-        toDoItem.dateToRemind = newDate
-        toDoItem.list = newList
-
-        do {
-            try context.save()
-        } catch {
-            fatalError("Error updating ToDoItem")
         }
     }
 }
@@ -190,17 +149,34 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM d, h:mm a"
-            dateFormatter.timeZone = TimeZone(abbreviation: "UTC+0")
+            dateFormatter.timeZone = TimeZone.current
             
             let cell: ToDoTableViewCell = self.TodayTableView!.dequeueReusableCell(withIdentifier: todayTableViewIdCell) as! ToDoTableViewCell
             
-            cell.ListItemTextField.text = item.text
+            cell.ToDoItemLabel.text = item.text
             cell.DoneButton.setBackgroundImage(image, for: .normal)
             cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
             cell.item = item
             
-            cell.layer.borderWidth = 1
-            cell.layer.cornerRadius = 8
+            let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: cell.bounds.height)
+            
+            let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
+            
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
+            shapeLayer.path = maskPath.cgPath
+            cell.layer.mask = shapeLayer
+            
+            let borderLayer = CAShapeLayer()
+            borderLayer.path = maskPath.cgPath
+            borderLayer.fillColor = UIColor.clear.cgColor
+            borderLayer.strokeColor = UIColor.black.cgColor
+            borderLayer.lineWidth = 3
+            borderLayer.frame = cell.bounds
+            cell.layer.addSublayer(borderLayer)
+            
+//            cell.layer.borderWidth = 1
+//            cell.layer.cornerRadius = 8
             
             return cell
             
@@ -210,10 +186,31 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             
             let cell: ListTableViewCell = self.ListsTableView.dequeueReusableCell(withIdentifier: listsTableViewIdCell) as! ListTableViewCell
             cell.ListNameLabel?.text = list.name
-            cell.ItemsCountLabel?.text = "Tasks: " + String(itemsByList[lists.firstIndex(of: list) ?? 0].count)
+            if list.name == "Completed" {
+                cell.ItemsCountLabel?.text = "Completed tasks: " + String(allItems.filter({ $0.isDone == true }).count)
+            } else {
+                cell.ItemsCountLabel?.text = "Tasks: " + String(itemsByList[lists.firstIndex(of: list) ?? 0].filter({$0.isDone == false}).count)
+            }
             
-            cell.layer.borderWidth = 1
-            cell.layer.cornerRadius = 8
+            let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: 75)
+            
+            let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
+            
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
+            shapeLayer.path = maskPath.cgPath
+            cell.layer.mask = shapeLayer
+            
+            let borderLayer = CAShapeLayer()
+            borderLayer.path = maskPath.cgPath
+            borderLayer.fillColor = UIColor.clear.cgColor
+            borderLayer.strokeColor = UIColor.black.cgColor
+            borderLayer.lineWidth = 3
+            borderLayer.frame = cell.bounds
+            cell.layer.addSublayer(borderLayer)
+            
+//            cell.layer.borderWidth = 1
+//            cell.layer.cornerRadius = 8
             
             return cell
         } else {
