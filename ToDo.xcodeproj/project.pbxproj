@@ -25,6 +25,9 @@
 		93FA0ACE28B6B75F00CE7C2D /* AllItemsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FA0ACD28B6B75F00CE7C2D /* AllItemsViewController.swift */; };
 		BA06EF49295B2C6100E13980 /* ListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA06EF47295B2C6100E13980 /* ListTableViewCell.swift */; };
 		BA06EF4A295B2C6100E13980 /* ListTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = BA06EF48295B2C6100E13980 /* ListTableViewCell.xib */; };
+		BA57172C296AF83A006809EB /* Extension+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA57172B296AF83A006809EB /* Extension+String.swift */; };
+		BA57172F296AF8A3006809EB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BA571731296AF8A3006809EB /* Localizable.strings */; };
+		BA611368296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = BA611367296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +51,11 @@
 		93FA0ACD28B6B75F00CE7C2D /* AllItemsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllItemsViewController.swift; sourceTree = "<group>"; };
 		BA06EF47295B2C6100E13980 /* ListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTableViewCell.swift; sourceTree = "<group>"; };
 		BA06EF48295B2C6100E13980 /* ListTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListTableViewCell.xib; sourceTree = "<group>"; };
+		BA57172A296AF7A3006809EB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		BA57172B296AF83A006809EB /* Extension+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+String.swift"; sourceTree = "<group>"; };
+		BA571730296AF8A3006809EB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		BA571732296AF8A6006809EB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		BA611367296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = arialroundedmtprocyr_bold.otf; path = "../../../../../Downloads/Arial Rounded MT Pro Cyr/arialroundedmtprocyr_bold.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +72,8 @@
 		931D866728A6698E001885BE = {
 			isa = PBXGroup;
 			children = (
+				BA571731296AF8A3006809EB /* Localizable.strings */,
+				BA57172B296AF83A006809EB /* Extension+String.swift */,
 				931D867228A6698E001885BE /* ToDo */,
 				931D867128A6698E001885BE /* Products */,
 			);
@@ -80,6 +90,7 @@
 		931D867228A6698E001885BE /* ToDo */ = {
 			isa = PBXGroup;
 			children = (
+				BA611366296AE12D00DB16B9 /* Fonts */,
 				BA06EF46295B245B00E13980 /* Cells */,
 				939E968C28A68B1D00C4AC3E /* Views */,
 				939E968B28A68B1300C4AC3E /* ViewContollers */,
@@ -135,6 +146,14 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		BA611366296AE12D00DB16B9 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				BA611367296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -177,6 +196,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 931D866728A6698E001885BE;
 			productRefGroup = 931D867128A6698E001885BE /* Products */;
@@ -193,8 +213,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA611368296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf in Resources */,
 				93FA0ACC28B6B29600CE7C2D /* ToDoTableViewCell.xib in Resources */,
 				931D868328A66992001885BE /* LaunchScreen.storyboard in Resources */,
+				BA57172F296AF8A3006809EB /* Localizable.strings in Resources */,
 				931D868028A66992001885BE /* Assets.xcassets in Resources */,
 				931D867B28A6698E001885BE /* Main.storyboard in Resources */,
 				BA06EF4A295B2C6100E13980 /* ListTableViewCell.xib in Resources */,
@@ -216,6 +238,7 @@
 				93FA0ACE28B6B75F00CE7C2D /* AllItemsViewController.swift in Sources */,
 				931D911628B564A800989DAB /* AddToDoItemViewController.swift in Sources */,
 				93048FA928A94C1A0065862E /* ListItemsViewController.swift in Sources */,
+				BA57172C296AF83A006809EB /* Extension+String.swift in Sources */,
 				939E968828A68ADE00C4AC3E /* ToDoItem+CoreDataClass.swift in Sources */,
 				93FA0ACB28B6B29600CE7C2D /* ToDoTableViewCell.swift in Sources */,
 				931D867E28A6698E001885BE /* ToDo.xcdatamodeld in Sources */,
@@ -231,6 +254,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				931D867A28A6698E001885BE /* Base */,
+				BA57172A296AF7A3006809EB /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -243,6 +267,15 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		BA571731296AF8A3006809EB /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BA571730296AF8A3006809EB /* en */,
+				BA571732296AF8A6006809EB /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -250,6 +283,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -310,6 +344,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";

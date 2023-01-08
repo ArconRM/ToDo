@@ -134,7 +134,7 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, h:mm a"
+        dateFormatter.dateFormat = "MMM d, HH:mm"
         dateFormatter.timeZone = TimeZone.current
         
         let cell: ToDoTableViewCell = self.AllItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! ToDoTableViewCell

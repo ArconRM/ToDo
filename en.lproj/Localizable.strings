@@ -1,0 +1,21 @@
+/* 
+  Localizable.strings
+  ToDo
+
+  Created by Артемий on 08.01.2023.
+  
+*/
+"No tasks for today" = "No tasks for today";
+"You have no lists" = "You have no lists";
+"Completed" = "Completed";
+"Completed tasks: " = "Completed tasks: ";
+"Tasks: " = "Tasks: ";
+"No tasks here :(" = "No tasks here :(";
+"Enter list" = "Enter list";
+"Incorrect list name" = "Incorrect list name";
+"List name must be unique and contain from 1 to 20 symbols" = "List name must be unique and contain from 1 to 20 symbols";
+"Enter task" = "Enter task";
+"Incorrect task" = "Incorrect task";
+"It can't be empty" = "It can't be empty";
+"Create" = "Create";
+"Update" = "Update";

@@ -1,0 +1,39 @@
+
+/* Class = "UILabel"; text = "Today"; ObjectID = "5a8-EU-BIL"; */
+"5a8-EU-BIL.text" = "Сегодня";
+
+/* Class = "UILabel"; text = "Your lists"; ObjectID = "6N1-ss-Uic"; */
+"6N1-ss-Uic.text" = "Списки";
+
+/* Class = "UITextField"; placeholder = "Enter list name"; ObjectID = "L7t-U6-W3L"; */
+"L7t-U6-W3L.placeholder" = "Введите название списка";
+
+/* Class = "UIButton"; normalTitle = "Create list"; ObjectID = "OBO-2I-66z"; */
+"OBO-2I-66z.normalTitle" = "Создать список";
+
+/* Class = "UIButton"; configuration.title = "Show all"; ObjectID = "S88-gj-ULP"; */
+"S88-gj-ULP.configuration.title" = "Все";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "S88-gj-ULP"; */
+"S88-gj-ULP.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Add new task"; ObjectID = "VHI-ic-Mij"; */
+"VHI-ic-Mij.normalTitle" = "Создать напоминание";
+
+/* Class = "UITextField"; placeholder = "Enter list name"; ObjectID = "WVJ-LT-1rq"; */
+"WVJ-LT-1rq.placeholder" = "Введите название списка";
+
+/* Class = "UIButton"; normalTitle = "Create"; ObjectID = "iR7-Uu-c5s"; */
+"iR7-Uu-c5s.normalTitle" = "Создать";
+
+/* Class = "UILabel"; text = "All"; ObjectID = "iqA-gN-Bdz"; */
+"iqA-gN-Bdz.text" = "Все";
+
+/* Class = "UILabel"; text = "Select a date to remind:"; ObjectID = "och-d9-ahX"; */
+"och-d9-ahX.text" = "Выберите дату:";
+
+/* Class = "UITextField"; placeholder = "Enter task"; ObjectID = "vwe-ga-2Ec"; */
+"vwe-ga-2Ec.placeholder" = "Введите напоминание";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "zKE-CG-ygh"; */
+"zKE-CG-ygh.normalTitle" = "Button";

@@ -28,8 +28,8 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
         
         if listItems.count == 0 {
             NoItemsLabel.frame = CGRect(x: 10.0, y: self.view.frame.height / 2, width: self.view.frame.width - 20.0, height: 50)
-            NoItemsLabel.text = "No tasks here :("
-            NoItemsLabel.font = UIFont(name: "ArialRoundedMTBold", size: 35)
+            NoItemsLabel.text = "No tasks here :(".localized()
+            NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
             NoItemsLabel.textAlignment = .center
             NoItemsLabel.textColor = .white
             self.view.addSubview(NoItemsLabel)
@@ -49,22 +49,25 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
         
         ListNameTextField.delegate = self
         ListNameTextField.text = selectedList.name
+        ListNameTextField.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 44.0)
         
         ItemsTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
         
         ItemsTableView.delegate = self
         ItemsTableView.dataSource = self
         
-        if selectedList.name == "Completed" {
+        if selectedList.name == completedName {
             AddButton.removeFromSuperview()
         }
+        AddButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 20.0)
+        AddButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "SegueFromItemsToAddItem") {
             let vc = segue.destination as! AddToDoItemViewController
             vc.selectedList = selectedList
-            vc.status = .add
+            vc.status = .create
         } else if (segue.identifier == "SegueFromItemsToUpdateItem") {
             let vc = segue.destination as! AddToDoItemViewController
             vc.selectedList = selectedList
@@ -75,10 +78,10 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     
     func fetchListItems() {
         do {
-            if selectedList.name == "Completed" {
+            if selectedList.name == completedName {
                 listItems = allItems.filter {$0.isDone == true}
             } else {
-                listItems = allItems.filter {$0.list?.id == selectedList.id}
+                listItems = allItems.filter {$0.list?.id == selectedList.id && !$0.isDone}
             }
             DispatchQueue.main.async {
                 self.ItemsTableView.reloadData()
@@ -99,7 +102,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func ListNameBeganChanging(_ sender: UITextField) {
-        if selectedList.name == "Completed" {
+        if selectedList.name == completedName {
             let alert = UIAlertController(title: "Forbidden", message: "You can't change this list name.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self.present(alert, animated: true, completion: nil)
@@ -124,7 +127,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func DeleteListPressed(_ sender: Any) {
-        if selectedList.name == "Completed" {
+        if selectedList.name == completedName {
             let alert = UIAlertController(title: "Forbidden", message: "You can't delete this list.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self.present(alert, animated: true, completion: nil)
@@ -153,7 +156,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
 extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if selectedList.name != "Completed" {
+        if selectedList.name != completedName {
             selectedItem = listItems[indexPath.row]
             performSegue(withIdentifier: "SegueFromItemsToUpdateItem", sender: nil)
             
@@ -171,7 +174,7 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
         let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d, h:mm a"
+        dateFormatter.dateFormat = "MMM d, HH:mm"
         dateFormatter.timeZone = TimeZone.current
         
         let cell: ToDoTableViewCell = self.ItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! ToDoTableViewCell

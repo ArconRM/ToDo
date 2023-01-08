@@ -13,17 +13,18 @@ let context = (UIApplication.shared.delegate as! AppDelegate).persistentContaine
 var allItems = [ToDoItem]() // массив всех тудушек
 var lists = [ToDoList]() // массив листов
 var itemsByList = [[ToDoItem]]() // массив массивов тудушек по листам
+let completedName = "Completed".localized()
 
 func fetchToDoItems() {
     do {
         allItems = try context.fetch(ToDoItem.fetchRequest())
         
         lists = try context.fetch(ToDoList.fetchRequest())
-        lists.removeAll {$0.name == "Completed"}
+        lists.removeAll {$0.name == completedName}
         
         if allItems.filter({$0.isDone == true}).count > 0 {
             var completedItems = ToDoList(context: context)
-            completedItems.name = "Completed"
+            completedItems.name = completedName
             lists.append(completedItems)
         }
         
@@ -41,6 +42,7 @@ class MainViewController: UIViewController {
     
     @IBOutlet weak var TodayTableView: UITableView!
     @IBOutlet weak var ListsTableView: UITableView!
+    @IBOutlet weak var CreateListButton: UIButton!
     
     private var todayItems = [ToDoItem]()
     
@@ -62,20 +64,20 @@ class MainViewController: UIViewController {
         
         if todayItems.count == 0 {
             NoItemsLabel.frame = CGRect(x: 10.0, y: TodayTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
-            NoItemsLabel.text = "No tasks for today"
-            NoItemsLabel.font = UIFont(name: "ArialRoundedMTBold", size: 25)
+            NoItemsLabel.text = "No tasks for today".localized()
+            NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
             NoItemsLabel.textAlignment = .center
-            NoItemsLabel.textColor = .black
+            NoItemsLabel.textColor = .label
             NoItemsLabel.numberOfLines = 2
             self.view.addSubview(NoItemsLabel)
         }
         
         if lists.count == 0 {
             NoListsLabel.frame = CGRect(x: 10.0, y: ListsTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
-            NoListsLabel.text = "You have no lists"
-            NoListsLabel.font = UIFont(name: "ArialRoundedMTBold", size: 25)
+            NoListsLabel.text = "You have no lists".localized()
+            NoListsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
             NoListsLabel.textAlignment = .center
-            NoListsLabel.textColor = .black
+            NoListsLabel.textColor = .label
             NoListsLabel.numberOfLines = 2
             self.view.addSubview(NoListsLabel)
         }
@@ -101,6 +103,11 @@ class MainViewController: UIViewController {
         ListsTableView.delegate = self
         TodayTableView.dataSource = self
         ListsTableView.dataSource = self
+        
+        CreateListButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 20.0)
+        CreateListButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
+        
+//        arialroundedmtprocyr_bold.otf
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -148,7 +155,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
             
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MMM d, h:mm a"
+            dateFormatter.dateFormat = "MMM d, HH:mm"
             dateFormatter.timeZone = TimeZone.current
             
             let cell: ToDoTableViewCell = self.TodayTableView!.dequeueReusableCell(withIdentifier: todayTableViewIdCell) as! ToDoTableViewCell
@@ -186,10 +193,10 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             
             let cell: ListTableViewCell = self.ListsTableView.dequeueReusableCell(withIdentifier: listsTableViewIdCell) as! ListTableViewCell
             cell.ListNameLabel?.text = list.name
-            if list.name == "Completed" {
-                cell.ItemsCountLabel?.text = "Completed tasks: " + String(allItems.filter({ $0.isDone == true }).count)
+            if list.name == completedName {
+                cell.ItemsCountLabel?.text = "Completed tasks: ".localized() + String(allItems.filter({ $0.isDone == true }).count)
             } else {
-                cell.ItemsCountLabel?.text = "Tasks: " + String(itemsByList[lists.firstIndex(of: list) ?? 0].filter({$0.isDone == false}).count)
+                cell.ItemsCountLabel?.text = "Tasks: ".localized() + String(itemsByList[lists.firstIndex(of: list) ?? 0].filter({$0.isDone == false}).count)
             }
             
             let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: 75)

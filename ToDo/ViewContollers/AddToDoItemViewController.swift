@@ -13,7 +13,7 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     
     enum Status: String {
         case unknown = "Error"
-        case add = "Add"
+        case create = "Create"
         case update = "Update"
     }
     
@@ -30,12 +30,11 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var DatePickerView: UIDatePicker!
     
     @IBAction func ButtonPressed(_ sender: UIButton) {
+        ActionButton.setTitle(status.rawValue.localized(), for: .normal)
         switch status {
-        case .add:
-            ActionButton.setTitle("Create", for: .normal)
+        case .create:
             createItem(text: ToDoItemTextField.text ?? "Error", date: selectedDate, list: selectedList)
         case .update:
-            ActionButton.setTitle("Update", for: .normal)
             updateItem(toDoItem: selectedItem, newText: ToDoItemTextField.text ?? "Error", newDate: selectedDate, notificationId: notificationId)
         default:
             return
@@ -61,8 +60,8 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
         
         ToDoItemTextField.delegate = self
         ToDoItemTextField.attributedPlaceholder = NSAttributedString(
-            string: "Enter task",
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.black]
+            string: "Enter task".localized(),
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.darkGray]
         )
         
         DatePickerView.locale = Locale.current
@@ -73,9 +72,8 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
         }
         
         ActionButton.setTitle(status.rawValue, for: .normal)
-//        ActionButton.titleLabel!.font = UIFont(name: "ArialRoundedMTBold", size: 24)
-        
-//        print(Locale.current)
+        ActionButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 24.0)
+        ActionButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
         
         notificationCenter.requestAuthorization(options: [.alert, .sound]) { (permissionGranted, error) in
             if(!permissionGranted)
@@ -87,7 +85,7 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     
     func updateItem(toDoItem: ToDoItem, newText: String, newDate: Date?, notificationId: UUID) {
         if newText == "" {
-            let alert = UIAlertController(title: "Incorrect ToDo", message: "ToDo can't be empty.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Incorrect task".localized(), message: "It can't be empty".localized(), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self.present(alert, animated: true, completion: nil)
         } else {
