@@ -66,6 +66,8 @@ class ToDoTableViewCell: UITableViewCell {
         super.layoutSubviews()
         
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
+        contentView.backgroundColor = .clear
+        contentView.tintColor = .clear
     }
     
     override var frame: CGRect {

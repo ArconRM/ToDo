@@ -58,6 +58,9 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addGradientBackground()
+        view.addBlurEffect()
+        
         ToDoItemTextField.delegate = self
         ToDoItemTextField.attributedPlaceholder = NSAttributedString(
             string: "Enter task".localized(),

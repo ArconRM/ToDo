@@ -31,7 +31,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
             NoItemsLabel.text = "No tasks here :(".localized()
             NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
             NoItemsLabel.textAlignment = .center
-            NoItemsLabel.textColor = .white
+            NoItemsLabel.textColor = .label
             self.view.addSubview(NoItemsLabel)
         }
     }
@@ -46,6 +46,9 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.addGradientBackground()
+        view.addBlurEffect()
         
         ListNameTextField.delegate = self
         ListNameTextField.text = selectedList.name
@@ -110,7 +113,10 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func ListNameEndedChanging(_ sender: UITextField) {
-        if sender.text != "" && !lists.contains(where: {$0.name == sender.text}) && sender.text!.count <= 20 {
+        if sender.text != "" &&
+            (!lists.contains(where: {$0.name == sender.text}) || lists.first(where: {$0.id == selectedList.id})?.name == sender.text) &&
+           sender.text!.count <= 20
+        {
             selectedList.name = sender.text
             
             do {
@@ -193,13 +199,14 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
         shapeLayer.path = maskPath.cgPath
         cell.layer.mask = shapeLayer
         
-        let borderLayer = CAShapeLayer()
-        borderLayer.path = maskPath.cgPath
-        borderLayer.fillColor = UIColor.clear.cgColor
-        borderLayer.strokeColor = UIColor.black.cgColor
-        borderLayer.lineWidth = 4
-        borderLayer.frame = cell.bounds
-        cell.layer.addSublayer(borderLayer)
+        ///нужно было в предыдущем дизайне
+//        let borderLayer = CAShapeLayer()
+//        borderLayer.path = maskPath.cgPath
+//        borderLayer.fillColor = UIColor.clear.cgColor
+//        borderLayer.strokeColor = UIColor.black.cgColor
+//        borderLayer.lineWidth = 4
+//        borderLayer.frame = cell.bounds
+//        cell.layer.addSublayer(borderLayer)
         
 //        cell.layer.borderWidth = 1 // сбрасывается при свайпе
         

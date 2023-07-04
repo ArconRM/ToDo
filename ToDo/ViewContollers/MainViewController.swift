@@ -95,8 +95,10 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        TodayTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: todayTableViewIdCell)
+        view.addGradientBackground()
+        view.addBlurEffect()
         
+        TodayTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: todayTableViewIdCell)
         ListsTableView.register(UINib(nibName: "ListTableViewCell", bundle: nil), forCellReuseIdentifier: listsTableViewIdCell)
         
         TodayTableView.delegate = self
@@ -165,7 +167,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
             cell.item = item
             
-            let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: cell.bounds.height)
+            let cellSize = CGSize(width: UIScreen.main.bounds.width - 35, height: cell.bounds.height - 0.3) 
             
             let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
             
@@ -174,13 +176,14 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             shapeLayer.path = maskPath.cgPath
             cell.layer.mask = shapeLayer
             
-            let borderLayer = CAShapeLayer()
-            borderLayer.path = maskPath.cgPath
-            borderLayer.fillColor = UIColor.clear.cgColor
-            borderLayer.strokeColor = UIColor.black.cgColor
-            borderLayer.lineWidth = 3
-            borderLayer.frame = cell.bounds
-            cell.layer.addSublayer(borderLayer)
+            /// в предыдущем дизайне было нужно
+//            let borderLayer = CAShapeLayer()
+//            borderLayer.path = maskPath.cgPath
+//            borderLayer.fillColor = UIColor.clear.cgColor
+//            borderLayer.strokeColor = UIColor.black.cgColor
+//            borderLayer.lineWidth = 3
+//            borderLayer.frame = cell.bounds
+//            cell.layer.addSublayer(borderLayer)
             
 //            cell.layer.borderWidth = 1
 //            cell.layer.cornerRadius = 8
@@ -199,29 +202,64 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.ItemsCountLabel?.text = "Tasks: ".localized() + String(itemsByList[lists.firstIndex(of: list) ?? 0].filter({$0.isDone == false}).count)
             }
             
-            let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: 75)
-            
+            let cellSize = CGSize(width: UIScreen.main.bounds.width - 35, height: 75)
+//
             let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
-            
+//
             let shapeLayer = CAShapeLayer()
             shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
             shapeLayer.path = maskPath.cgPath
             cell.layer.mask = shapeLayer
             
-            let borderLayer = CAShapeLayer()
-            borderLayer.path = maskPath.cgPath
-            borderLayer.fillColor = UIColor.clear.cgColor
-            borderLayer.strokeColor = UIColor.black.cgColor
-            borderLayer.lineWidth = 3
-            borderLayer.frame = cell.bounds
-            cell.layer.addSublayer(borderLayer)
+/// в предыдущем дизайне было нужно
+//            let borderLayer = CAShapeLayer()
+//            borderLayer.path = maskPath.cgPath
+//            borderLayer.fillColor = UIColor.clear.cgColor
+//            borderLayer.strokeColor = UIColor.black.cgColor
+//            borderLayer.opacity = 0.01
+//            borderLayer.lineWidth = 10
+//            borderLayer.frame = cell.bounds
+//            cell.layer.addSublayer(borderLayer)
             
 //            cell.layer.borderWidth = 1
 //            cell.layer.cornerRadius = 8
+            
+//            cell.layer.shadowOffset = CGSize(width: 100, height: 100)
+//            cell.layer.shadowRadius = 20
             
             return cell
         } else {
             return UITableViewCell()
         }
+    }
+}
+
+extension CAGradientLayer {
+    static func gradientLayer(in frame: CGRect) -> Self {
+        let gradientLayer = Self()
+        gradientLayer.frame = frame
+        
+        let topColor = UIColor.red.cgColor
+        let bottomColor = UIColor.blue.cgColor
+        gradientLayer.colors = [topColor, bottomColor]
+        gradientLayer.opacity = 0.08
+        
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        return gradientLayer
+    }
+}
+
+extension UIView {
+    func addGradientBackground() {
+        self.layer.insertSublayer(CAGradientLayer.gradientLayer(in: self.bounds), at: 0)
+    }
+    
+    func addBlurEffect() {
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = self.bounds
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.insertSubview(blurEffectView, at: 1)
     }
 }

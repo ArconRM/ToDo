@@ -140,8 +140,8 @@
 			children = (
 				93FA0ACA28B6B29600CE7C2D /* ToDoTableViewCell.xib */,
 				93FA0AC928B6B29600CE7C2D /* ToDoTableViewCell.swift */,
-				BA06EF47295B2C6100E13980 /* ListTableViewCell.swift */,
 				BA06EF48295B2C6100E13980 /* ListTableViewCell.xib */,
+				BA06EF47295B2C6100E13980 /* ListTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";

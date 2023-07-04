@@ -50,6 +50,9 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addGradientBackground()
+        view.addBlurEffect()
+        
         let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height + 400
         let displayWidth: CGFloat = self.view.frame.width
         let displayHeight: CGFloat = self.view.frame.height
@@ -58,7 +61,7 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
         scrollView.addSubview(contentView)
         contentView.addSubview(stackView)
         setupViewsConstraints()
-        scrollView.layer.zPosition = -1
+//        scrollView.layer.zPosition = -1
         
         var index = 0
         
@@ -71,7 +74,7 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             
             let label = UILabel(frame: CGRect(x: 20, y: barHeight - 270, width: 200, height: 40))
             label.font = .systemFont(ofSize: 30, weight: .bold)
-            label.textColor = .white
+            label.textColor = .label
             label.textAlignment = .left
             label.text = list.name
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -153,14 +156,15 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         shapeLayer.path = maskPath.cgPath
         cell.layer.mask = shapeLayer
         
-        let borderLayer = CAShapeLayer()
-        borderLayer.path = maskPath.cgPath
-        borderLayer.fillColor = UIColor.clear.cgColor
-        borderLayer.strokeColor = UIColor.black.cgColor
-        borderLayer.lineWidth = 4
-        borderLayer.frame = cell.bounds
-        cell.layer.addSublayer(borderLayer)
-        
+        /// в предыдущем дизайне было нужно
+//        let borderLayer = CAShapeLayer()
+//        borderLayer.path = maskPath.cgPath
+//        borderLayer.fillColor = UIColor.clear.cgColor
+//        borderLayer.strokeColor = UIColor.black.cgColor
+//        borderLayer.lineWidth = 4
+//        borderLayer.frame = cell.bounds
+//        cell.layer.addSublayer(borderLayer)
+//
         
 //        cell.layer.borderWidth = 1
 //        cell.layer.cornerRadius = 8

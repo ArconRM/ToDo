@@ -51,6 +51,9 @@ class AddListViewContoller: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addGradientBackground()
+        view.addBlurEffect()
+        
         AddTextField.delegate = self
         AddTextField.attributedPlaceholder = NSAttributedString(
             string: "Enter list".localized(),
