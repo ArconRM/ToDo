@@ -13,6 +13,8 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     @IBOutlet weak var ViewHeader: UIView!
     
     private let cellId = "ToDoItem"
+    private var allItems = [ToDoItem]()
+    private var lists = [ToDoList]()
     
     private var contentSize: CGSize {
         CGSize(width: view.frame.width, height: CGFloat((85 * allItems.count + 50 * lists.count)))
@@ -43,12 +45,11 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     
     private var tableViews = [UITableView]()
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        allItems = ToDoItemsCoreDataManager.shared.fetchAllToDoItems()
+        lists = ToDoListsCoreDataManager.shared.fetchToDoListsWithCompletedListBeingLast().dropLast()
         
         view.addGradientBackground()
         view.addBlurEffect()
@@ -61,16 +62,10 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
         scrollView.addSubview(contentView)
         contentView.addSubview(stackView)
         setupViewsConstraints()
-//        scrollView.layer.zPosition = -1
         
-        var index = 0
+        var listIndex = 0
         
         for list in lists {
-//
-//            if (itemsByList[index].count == 0) {
-//                index += 1
-//                continue
-//            }
             
             let label = UILabel(frame: CGRect(x: 20, y: barHeight - 270, width: 200, height: 40))
             label.font = .systemFont(ofSize: 30, weight: .bold)
@@ -84,7 +79,7 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
                 label.heightAnchor.constraint(equalToConstant: 40),
             ])
             
-            if itemsByList[index].count > 0 {
+            if list.getItems().count > 0 {
                 stackView.addArrangedSubview(label)
             }
             
@@ -102,14 +97,18 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             
             NSLayoutConstraint.activate([
                 AllItemsTableView!.widthAnchor.constraint(equalToConstant: displayWidth - 25),
-                AllItemsTableView!.heightAnchor.constraint(equalToConstant: CGFloat(itemsByList[index].count * 80)),
+                AllItemsTableView!.heightAnchor.constraint(equalToConstant: CGFloat((list.getItems().count ) * 80)),
             ])
             
-            if itemsByList[index].count > 0 {
+            if list.getItems().count > 0 {
                 stackView.addArrangedSubview(AllItemsTableView ?? UITableView())
             }
-            index += 1
+            listIndex += 1
         }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
     }
 }
 
@@ -126,12 +125,12 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemsByList[tableViews.firstIndex(of: tableView) ?? 0].count
+        return lists[tableViews.firstIndex(of: tableView) ?? 0].getItems().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let items = itemsByList[tableViews.firstIndex(of: tableView) ?? 0]
+        let items = lists[tableViews.firstIndex(of: tableView) ?? 0].getItems()
         let item = items[indexPath.row]
         
         let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
@@ -155,19 +154,6 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
         shapeLayer.path = maskPath.cgPath
         cell.layer.mask = shapeLayer
-        
-        /// в предыдущем дизайне было нужно
-//        let borderLayer = CAShapeLayer()
-//        borderLayer.path = maskPath.cgPath
-//        borderLayer.fillColor = UIColor.clear.cgColor
-//        borderLayer.strokeColor = UIColor.black.cgColor
-//        borderLayer.lineWidth = 4
-//        borderLayer.frame = cell.bounds
-//        cell.layer.addSublayer(borderLayer)
-//
-        
-//        cell.layer.borderWidth = 1
-//        cell.layer.cornerRadius = 8
         
         return cell
     }

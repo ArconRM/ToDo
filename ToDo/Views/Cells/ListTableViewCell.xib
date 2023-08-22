@@ -33,11 +33,11 @@
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
-                <color key="backgroundColor" name="BackgroundColor"/>
-                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <color key="backgroundColor" name="AccentColor"/>
+                <color key="tintColor" name="AccentColor"/>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
-            <color key="backgroundColor" name="BackgroundColor"/>
+            <color key="backgroundColor" name="AccentColor"/>
             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="ItemsCountLabel" destination="Wl2-l7-q1I" id="wnU-Tq-tMk"/>
@@ -47,8 +47,8 @@
         </tableViewCell>
     </objects>
     <resources>
-        <namedColor name="BackgroundColor">
-            <color red="1" green="1" blue="1" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="AccentColor">
+            <color red="1" green="1" blue="1" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

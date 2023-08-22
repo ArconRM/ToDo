@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UserNotifications
 
-class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
+class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
     
     enum Status: String {
         case unknown = "Error"
@@ -31,6 +31,7 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func ButtonPressed(_ sender: UIButton) {
         ActionButton.setTitle(status.rawValue.localized(), for: .normal)
+        
         switch status {
         case .create:
             createItem(text: ToDoItemTextField.text ?? "Error", date: selectedDate, list: selectedList)
@@ -39,6 +40,7 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
         default:
             return
         }
+        
         _ = navigationController?.popViewController(animated: true)
     }
     
@@ -74,7 +76,7 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
             DatePickerView.date = selectedItem.dateToRemind ?? Date.now
         }
         
-        ActionButton.setTitle(status.rawValue, for: .normal)
+        ActionButton.setTitle(status.rawValue.localized(), for: .normal)
         ActionButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 24.0)
         ActionButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
         
@@ -108,7 +110,7 @@ class AddToDoItemViewController: UIViewController, UITextFieldDelegate {
     
     func createItem(text: String, date: Date, list: ToDoList) {
         if text == "" {
-            let alert = UIAlertController(title: "Empty field", message: "ToDo can't be empty.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Incorrect task".localized(), message: "It can't be empty".localized(), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self.present(alert, animated: true, completion: nil)
         } else {

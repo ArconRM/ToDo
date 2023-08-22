@@ -19,7 +19,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="puv-yU-rm9">
-                        <rect key="frame" x="8" y="19" width="30" height="41"/>
+                        <rect key="frame" x="8" y="17" width="30" height="45"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -43,11 +43,11 @@
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
-                <color key="backgroundColor" name="BackgroundColor"/>
-                <color key="tintColor" name="BackgroundColor"/>
+                <color key="backgroundColor" name="AccentColor"/>
+                <color key="tintColor" name="AccentColor"/>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
-            <color key="backgroundColor" name="BackgroundColor"/>
+            <color key="backgroundColor" name="AccentColor"/>
             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="DateLabel" destination="gW4-Ig-Ki8" id="Gdx-dz-IdG"/>
@@ -60,8 +60,8 @@
     </objects>
     <resources>
         <image name="circle" catalog="system" width="128" height="123"/>
-        <namedColor name="BackgroundColor">
-            <color red="1" green="1" blue="1" alpha="0.80000006198883056" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="AccentColor">
+            <color red="1" green="1" blue="1" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

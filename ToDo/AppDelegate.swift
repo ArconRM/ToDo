@@ -8,9 +8,6 @@
 import UIKit
 import CoreData
 
-
-let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     

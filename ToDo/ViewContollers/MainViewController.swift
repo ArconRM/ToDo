@@ -7,37 +7,6 @@
 
 import UIKit
 
-// общее
-let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
-var allItems = [ToDoItem]() // массив всех тудушек
-var lists = [ToDoList]() // массив листов
-var itemsByList = [[ToDoItem]]() // массив массивов тудушек по листам
-let completedName = "Completed".localized()
-
-func fetchToDoItems() {
-    do {
-        allItems = try context.fetch(ToDoItem.fetchRequest())
-        
-        lists = try context.fetch(ToDoList.fetchRequest())
-        lists.removeAll {$0.name == completedName}
-        
-        if allItems.filter({$0.isDone == true}).count > 0 {
-            var completedItems = ToDoList(context: context)
-            completedItems.name = completedName
-            lists.append(completedItems)
-        }
-        
-        itemsByList = []
-        for list in lists {
-            itemsByList.append(allItems.filter {$0.list?.id == list.id})
-        }
-    } catch {
-        fatalError("Error fetching ToDo items")
-    }
-}
-// общее
-
 class MainViewController: UIViewController {
     
     @IBOutlet weak var TodayTableView: UITableView!
@@ -45,17 +14,26 @@ class MainViewController: UIViewController {
     @IBOutlet weak var CreateListButton: UIButton!
     
     private var todayItems = [ToDoItem]()
+    private var allItems = [ToDoItem]()
+    private var lists = [ToDoList]()
     
     private let todayTableViewIdCell = "ToDoItem"
     private let listsTableViewIdCell = "ListCell"
     private var selectedList = ToDoList()
     
-    let NoItemsLabel = UILabel.init()
-    let NoListsLabel = UILabel.init()
+    private let NoItemsLabel = UILabel.init()
+    private let NoListsLabel = UILabel.init()
     
     override func viewWillAppear(_ animated: Bool) {
-        fetchToDoItems()
-        getTodayItems()
+        super.viewWillAppear(animated)
+        
+        view.addGradientBackground()
+        view.addBlurEffect()
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        allItems = ToDoItemsCoreDataManager.shared.fetchAllToDoItems()
+        lists = ToDoListsCoreDataManager.shared.fetchToDoListsWithCompletedListBeingLast()
+        _getTodayItems()
         
         DispatchQueue.main.async {
             self.TodayTableView.reloadData()
@@ -63,41 +41,50 @@ class MainViewController: UIViewController {
         }
         
         if todayItems.count == 0 {
-            NoItemsLabel.frame = CGRect(x: 10.0, y: TodayTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
-            NoItemsLabel.text = "No tasks for today".localized()
-            NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
-            NoItemsLabel.textAlignment = .center
-            NoItemsLabel.textColor = .label
-            NoItemsLabel.numberOfLines = 2
-            self.view.addSubview(NoItemsLabel)
+            _addNoItemsLabel()
         }
         
         if lists.count == 0 {
-            NoListsLabel.frame = CGRect(x: 10.0, y: ListsTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
-            NoListsLabel.text = "You have no lists".localized()
-            NoListsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
-            NoListsLabel.textAlignment = .center
-            NoListsLabel.textColor = .label
-            NoListsLabel.numberOfLines = 2
-            self.view.addSubview(NoListsLabel)
+            _addNoListsLabel()
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        NoItemsLabel.removeFromSuperview()
-        NoListsLabel.removeFromSuperview()
+    private func _getTodayItems() {
+        todayItems = []
+        for item in allItems {
+            if Calendar.current.dateComponents([.day], from: item.dateToRemind ?? Date.distantPast) == Calendar.current.dateComponents([.day], from: Date.now) && item.isDone == false {
+                todayItems.append(item)
+            }
+        }
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+    private func _addNoItemsLabel() {
+        NoItemsLabel.frame = CGRect(x: 10.0, y: TodayTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
+        NoItemsLabel.text = "No tasks for today".localized()
+        NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
+        NoItemsLabel.textAlignment = .center
+        NoItemsLabel.textColor = .label
+        NoItemsLabel.numberOfLines = 2
+        self.view.addSubview(NoItemsLabel)
+    }
+    
+    private func _addNoListsLabel() {
+        NoListsLabel.frame = CGRect(x: 10.0, y: ListsTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
+        NoListsLabel.text = "You have no lists".localized()
+        NoListsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
+        NoListsLabel.textAlignment = .center
+        NoListsLabel.textColor = .label
+        NoListsLabel.numberOfLines = 2
+        self.view.addSubview(NoListsLabel)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addGradientBackground()
-        view.addBlurEffect()
-        
+        _configure()
+    }
+    
+    private func _configure() {
         TodayTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: todayTableViewIdCell)
         ListsTableView.register(UINib(nibName: "ListTableViewCell", bundle: nil), forCellReuseIdentifier: listsTableViewIdCell)
         
@@ -108,8 +95,20 @@ class MainViewController: UIViewController {
         
         CreateListButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 20.0)
         CreateListButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
-//        arialroundedmtprocyr_bold.otf
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        view.removeBackgroundEffects()
+        
+        NoItemsLabel.removeFromSuperview()
+        NoListsLabel.removeFromSuperview()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -119,15 +118,11 @@ class MainViewController: UIViewController {
         }
     }
     
-    func getTodayItems() {
-        todayItems = []
-        for item in allItems {
-            if Calendar.current.dateComponents([.day], from: item.dateToRemind ?? Date.distantPast) == Calendar.current.dateComponents([.day], from: Date.now) && item.isDone == false {
-                todayItems.append(item)
-            }
-        }
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
     }
 }
+
 
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
@@ -161,7 +156,6 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             dateFormatter.timeZone = TimeZone.current
             
             let cell: ToDoTableViewCell = self.TodayTableView!.dequeueReusableCell(withIdentifier: todayTableViewIdCell) as! ToDoTableViewCell
-            
             cell.ToDoItemLabel.text = item.text
             cell.DoneButton.setBackgroundImage(image, for: .normal)
             cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
@@ -176,18 +170,6 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             shapeLayer.path = maskPath.cgPath
             cell.layer.mask = shapeLayer
             
-            /// в предыдущем дизайне было нужно
-//            let borderLayer = CAShapeLayer()
-//            borderLayer.path = maskPath.cgPath
-//            borderLayer.fillColor = UIColor.clear.cgColor
-//            borderLayer.strokeColor = UIColor.black.cgColor
-//            borderLayer.lineWidth = 3
-//            borderLayer.frame = cell.bounds
-//            cell.layer.addSublayer(borderLayer)
-            
-//            cell.layer.borderWidth = 1
-//            cell.layer.cornerRadius = 8
-            
             return cell
             
         } else if tableView == ListsTableView {
@@ -196,70 +178,25 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             
             let cell: ListTableViewCell = self.ListsTableView.dequeueReusableCell(withIdentifier: listsTableViewIdCell) as! ListTableViewCell
             cell.ListNameLabel?.text = list.name
-            if list.name == completedName {
-                cell.ItemsCountLabel?.text = "Completed tasks: ".localized() + String(allItems.filter({ $0.isDone == true }).count)
+            
+            if ToDoListsCoreDataManager.shared.checkIfListIsCompleted(list) {
+                cell.ItemsCountLabel.text = "Tasks: ".localized() + String(allItems.filter({ $0.isDone }).count)
             } else {
-                cell.ItemsCountLabel?.text = "Tasks: ".localized() + String(itemsByList[lists.firstIndex(of: list) ?? 0].filter({$0.isDone == false}).count)
+                cell.ItemsCountLabel?.text = "Tasks: ".localized() + String(list.getUncompletedItems().count)
             }
             
             let cellSize = CGSize(width: UIScreen.main.bounds.width - 35, height: 75)
-//
+
             let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
-//
+
             let shapeLayer = CAShapeLayer()
             shapeLayer.frame = CGRect(origin: cell.bounds.origin, size: cellSize)
             shapeLayer.path = maskPath.cgPath
             cell.layer.mask = shapeLayer
             
-/// в предыдущем дизайне было нужно
-//            let borderLayer = CAShapeLayer()
-//            borderLayer.path = maskPath.cgPath
-//            borderLayer.fillColor = UIColor.clear.cgColor
-//            borderLayer.strokeColor = UIColor.black.cgColor
-//            borderLayer.opacity = 0.01
-//            borderLayer.lineWidth = 10
-//            borderLayer.frame = cell.bounds
-//            cell.layer.addSublayer(borderLayer)
-            
-//            cell.layer.borderWidth = 1
-//            cell.layer.cornerRadius = 8
-            
-//            cell.layer.shadowOffset = CGSize(width: 100, height: 100)
-//            cell.layer.shadowRadius = 20
-            
             return cell
         } else {
             return UITableViewCell()
         }
-    }
-}
-
-extension CAGradientLayer {
-    static func gradientLayer(in frame: CGRect) -> Self {
-        let gradientLayer = Self()
-        gradientLayer.frame = frame
-        
-        let topColor = UIColor.red.cgColor
-        let bottomColor = UIColor.blue.cgColor
-        gradientLayer.colors = [topColor, bottomColor]
-        gradientLayer.opacity = 0.08
-        
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        return gradientLayer
-    }
-}
-
-extension UIView {
-    func addGradientBackground() {
-        self.layer.insertSublayer(CAGradientLayer.gradientLayer(in: self.bounds), at: 0)
-    }
-    
-    func addBlurEffect() {
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = self.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.insertSubview(blurEffectView, at: 1)
     }
 }
