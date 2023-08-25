@@ -11,7 +11,7 @@ import CoreData
 
 public final class ToDoItemsCoreDataManager: NSObject {
     private override init() { }
-
+    
     public static let shared = ToDoItemsCoreDataManager()
     
     private var _appDelegate: AppDelegate {
@@ -21,7 +21,6 @@ public final class ToDoItemsCoreDataManager: NSObject {
     private var _context: NSManagedObjectContext {
         _appDelegate.persistentContainer.viewContext
     }
-    
     
     public func fetchAllToDoItems() -> [ToDoItem] {
         do {
@@ -40,14 +39,27 @@ public final class ToDoItemsCoreDataManager: NSObject {
         }
     }
     
-//    public func getToDoItemsByLists() {
-//        for list in ToDoItemsCoreDataManager.lists {
-//            CoreDataManager.itemsByLists.append(list.items?.allObjects as! [ToDoItem])
-//        }
-//    }
+    public func fetchUncompletedToDoItems() -> [ToDoItem] {
+        do {
+            var allItems = try _context.fetch(ToDoItem.fetchRequest())
+            return allItems.filter({ !$0.isDone })
+        } catch {
+            fatalError("Error fetching ToDo items")
+        }
+    }
     
-    func deleteToDoItem(item: ToDoItem) {
+    //    public func getToDoItemsByLists() {
+    //        for list in ToDoItemsCoreDataManager.lists {
+    //            CoreDataManager.itemsByLists.append(list.items?.allObjects as! [ToDoItem])
+    //        }
+    //    }
+    
+    func deleteToDoItem(item: ToDoItem, list: ToDoList, notificationCenter: UNUserNotificationCenter) {
         _context.delete(item)
+        NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId?.uuidString ?? "")
+        
+        ToDoListsCoreDataManager.shared.removeItemFromList(item: item, list: list)
+        
         _appDelegate.saveContext()
     }
     
@@ -71,15 +83,16 @@ public final class ToDoItemsCoreDataManager: NSObject {
             _appDelegate.saveContext()
         }
     }
-
-    func updateItem(list: ToDoList, toDoItem: ToDoItem, newText: String, newDate: Date, notificationCenter: UNUserNotificationCenter, notificationId: UUID) throws {
+    
+    func updateItem(list: ToDoList, item: ToDoItem, newText: String, newDate: Date, notificationCenter: UNUserNotificationCenter, notificationId: UUID) throws {
         if newText == "" {
             throw InputErrors.emptyTaskInputError
         } else {
-            toDoItem.text = newText
-            toDoItem.dateToRemind = newDate
-            toDoItem.notificationId = notificationId
+            item.text = newText
+            item.dateToRemind = newDate
+            item.notificationId = notificationId
             
+            NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId?.uuidString ?? "")
             NotificationManager.shared.createNotification(notificationCenter: notificationCenter, title: list.name ?? "Error", body: newText, selectedDate: newDate, id: notificationId)
             
             _appDelegate.saveContext()
@@ -90,10 +103,8 @@ public final class ToDoItemsCoreDataManager: NSObject {
         item.isDone.toggle()
         
         if item.isDone {
-//            ToDoListsCoreDataManager.shared.addItemToCompletedList(item: item)
             NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId!.uuidString)
         } else {
-//            ToDoListsCoreDataManager.shared.removeItemFromCompletedList(item: item)
             NotificationManager.shared.createNotification(notificationCenter: notificationCenter, title: item.notificationTitle!, body: item.text!, selectedDate: item.dateToRemind!, id: item.notificationId!)
         }
         

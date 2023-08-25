@@ -98,6 +98,25 @@ public final class ToDoListsCoreDataManager: NSObject {
         }
     }
     
+    func fetchToDoListsWithoutCompletedList() -> [ToDoList] {
+        do {
+            var lists = try _context.fetch(ToDoList.fetchRequest())
+            
+//            if _isFirstLaunch() {
+//                let completedList = ToDoList(context: _context)
+//                completedList.id = UUID()
+//                completedList.name = "Completed".localized()
+//
+//                lists.append(completedList)
+//                _appDelegate.saveContext()
+//                encodeCompletedListId(id: completedList.id!)
+//            }
+            return lists.filter({ !checkIfListIsCompleted($0) })
+        } catch {
+            fatalError("Error fetching ToDo lists")
+        }
+    }
+    
     private func _isFirstLaunch() -> Bool {
         let defaults = UserDefaults.standard
         if let _ = defaults.string(forKey: "isAppAlreadyLaunchedOnce") {
@@ -114,16 +133,6 @@ public final class ToDoListsCoreDataManager: NSObject {
         result.append(completedList)
         return result
     }
-    
-    
-    //    public func getCompletedOrUncompletedItemsDependingOnList(list: ToDoList) -> [ToDoItem] {
-    //        if list.id == decodeCompletedListId() {
-    //            var allItems = ToDoItemsCoreDataManager.shared.fetchAllToDoItems()
-    //            return allItems.filter({ $0.isDone })
-    //        } else {
-    //            return list.getUncompletedItems()
-    //        }
-    //    }
     
     
     public func updateListName(list: ToDoList, newName: String) throws {
@@ -144,25 +153,15 @@ public final class ToDoListsCoreDataManager: NSObject {
         _appDelegate.saveContext()
     }
     
-    //    public func addItemToCompletedList(item: ToDoItem) {
-    //        var completedList = fetchToDoLists().first(where: { $0.id == decodeCompletedListId() })
-    //        var array = completedList?.getItems()
-    //        array?.append(item)
-    //        completedList?.items = NSOrderedSet(array: array ?? [])
-    //
-    //        _appDelegate.saveContext()
-    //    }
-    
-    //    public func removeItemFromCompletedList(item: ToDoItem) {
-    //        var completedList = fetchToDoLists().first(where: { $0.id == decodeCompletedListId() })
-    //        var array = completedList!.getItems()
-    //        if let index = array.firstIndex(where: { $0.id == item.id }) {
-    //            array.remove(at: index)
-    //        }
-    //        completedList?.items = NSOrderedSet(array: array )
-    //
-    //        _appDelegate.saveContext()
-    //    }
+    public func removeItemFromList(item: ToDoItem, list: ToDoList) {
+        var array = list.getItems()
+        if let index = array.firstIndex(where: { $0.id == item.id }) {
+            array.remove(at: index)
+        }
+        list.items = NSOrderedSet(array: array )
+        
+        _appDelegate.saveContext()
+    }
     
     public func deleteList(_ list: ToDoList) {
         for item in list.getItems() {

@@ -22,7 +22,7 @@ class ToDoTableViewCell: UITableViewCell {
         
         ToDoItemsCoreDataManager.shared.toggleItemIsDoneStatus(item: item, notificationCenter: notificationCenter)
         
-        let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
+        let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "circle")
         
         DoneButton.setBackgroundImage(image, for: .normal)
     }

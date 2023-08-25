@@ -50,7 +50,7 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
             }
         case .update:
             do {
-                try ToDoItemsCoreDataManager.shared.updateItem(list: selectedList, toDoItem: selectedItem, newText: ToDoItemTextField.text ?? "Error", newDate: _selectedDate, notificationCenter: notificationCenter, notificationId: _notificationId)
+                try ToDoItemsCoreDataManager.shared.updateItem(list: selectedList, item: selectedItem, newText: ToDoItemTextField.text ?? "Error", newDate: _selectedDate, notificationCenter: notificationCenter, notificationId: _notificationId)
             }
             catch InputErrors.emptyTaskInputError {
                 let alert = UIAlertController(title: "Incorrect task".localized(), message: "It can't be empty".localized(), preferredStyle: .alert)

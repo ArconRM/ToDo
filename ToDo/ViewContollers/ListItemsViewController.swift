@@ -17,6 +17,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     private var _lists = [ToDoList]()
     private var _listItems = [ToDoItem]()
     private let _cellId = "ToDoItem"
+    private let notificationCenter = UNUserNotificationCenter.current()
     
     var selectedList = ToDoList()
     var selectedItem = ToDoItem()
@@ -192,11 +193,13 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete".localized()) {
             (action, sourceView, completionHandler) in
-            ToDoItemsCoreDataManager.shared.deleteToDoItem(item: self._listItems[indexPath.row])
-            DispatchQueue.main.async {
-                self.ItemsTableView.reloadData()
-            }
-            self._listItems = self.selectedList.getItems()
+            
+            UIView.transition(with: self.view,
+                              duration: 0.35,
+                              options: .transitionCrossDissolve,
+                              animations: {
+                                self._deleteItemWithTableUpdate(item: self._listItems[indexPath.row])
+                            })
             completionHandler(true)
         }
         deleteAction.image = UIImage(systemName: "trash.fill")
@@ -208,4 +211,17 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
         
     }
     
+    private func _deleteItemWithTableUpdate(item: ToDoItem) {
+        ToDoItemsCoreDataManager.shared.deleteToDoItem(item: item, list: self.selectedList, notificationCenter: self.notificationCenter)
+        
+        if ToDoListsCoreDataManager.shared.checkIfListIsCompleted(self.selectedList) {
+            self._listItems = ToDoItemsCoreDataManager.shared.fetchCompletedToDoItems()
+        } else {
+            self._listItems = self.selectedList.getUncompletedItems()
+        }
+        
+        DispatchQueue.main.async {
+            self.ItemsTableView.reloadData()
+        }
+    }
 }
