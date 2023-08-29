@@ -9,6 +9,6 @@ import Foundation
 import UIKit
 
 enum InputErrors: Error {
-    case emptyTaskInputError
+    case emptyTaskError
     case invalidListNameError
 }

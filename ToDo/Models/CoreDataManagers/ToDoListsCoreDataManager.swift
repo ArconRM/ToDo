@@ -42,7 +42,7 @@ public final class ToDoListsCoreDataManager: NSObject {
         if !_checkListName(name: name) {
             throw InputErrors.invalidListNameError
         } else {
-            var newList = ToDoList(context: _context)
+            let newList = ToDoList(context: _context)
             
             newList.id = UUID()
             newList.name = name
@@ -58,62 +58,14 @@ public final class ToDoListsCoreDataManager: NSObject {
     }
     
     
-    public func fetchToDoLists() -> [ToDoList] {
-        do {
-            var lists = try _context.fetch(ToDoList.fetchRequest())
+    public func createCompletedListIfFirstLaunch() {
+        if _isFirstLaunch() {
+            let completedList = ToDoList(context: _context)
+            completedList.id = UUID()
+            completedList.name = "Completed".localized()
             
-            if _isFirstLaunch() {
-                let completedList = ToDoList(context: _context)
-                completedList.id = UUID()
-                completedList.name = "Completed".localized()
-                
-                lists.append(completedList)
-                _appDelegate.saveContext()
-                encodeCompletedListId(id: completedList.id!)
-            }
-            return lists
-        } catch {
-            fatalError("Error fetching ToDo lists")
-        }
-    }
-    
-    func fetchToDoListsWithCompletedListBeingLast() -> [ToDoList] {
-        do {
-            var lists = try _context.fetch(ToDoList.fetchRequest())
-            
-            if _isFirstLaunch() {
-                let completedList = ToDoList(context: _context)
-                completedList.id = UUID()
-                completedList.name = "Completed".localized()
-                
-                lists.append(completedList)
-                _appDelegate.saveContext()
-                encodeCompletedListId(id: completedList.id!)
-            }
-            
-            lists = _moveCompletedListToEnd(array: lists)
-            return lists
-        } catch {
-            fatalError("Error fetching ToDo lists")
-        }
-    }
-    
-    func fetchToDoListsWithoutCompletedList() -> [ToDoList] {
-        do {
-            var lists = try _context.fetch(ToDoList.fetchRequest())
-            
-//            if _isFirstLaunch() {
-//                let completedList = ToDoList(context: _context)
-//                completedList.id = UUID()
-//                completedList.name = "Completed".localized()
-//
-//                lists.append(completedList)
-//                _appDelegate.saveContext()
-//                encodeCompletedListId(id: completedList.id!)
-//            }
-            return lists.filter({ !checkIfListIsCompleted($0) })
-        } catch {
-            fatalError("Error fetching ToDo lists")
+            _appDelegate.saveContext()
+            encodeCompletedListId(id: completedList.id!)
         }
     }
     
@@ -124,6 +76,35 @@ public final class ToDoListsCoreDataManager: NSObject {
         } else {
             defaults.set(true, forKey: "isAppAlreadyLaunchedOnce")
             return true
+        }
+    }
+    
+    
+    public func fetchToDoLists() -> [ToDoList] {
+        do {
+            var lists = try _context.fetch(ToDoList.fetchRequest())
+            return lists
+        } catch {
+            fatalError("Error fetching ToDo lists")
+        }
+    }
+    
+    func fetchToDoListsWithCompletedListBeingLast() -> [ToDoList] {
+        do {
+            var lists = try _context.fetch(ToDoList.fetchRequest())
+            lists = _moveCompletedListToEnd(array: lists)
+            return lists
+        } catch {
+            fatalError("Error fetching ToDo lists")
+        }
+    }
+    
+    func fetchToDoListsWithoutCompletedList() -> [ToDoList] {
+        do {
+            let lists = try _context.fetch(ToDoList.fetchRequest())
+            return lists.filter({ !checkIfListIsCompleted($0) })
+        } catch {
+            fatalError("Error fetching ToDo lists")
         }
     }
     

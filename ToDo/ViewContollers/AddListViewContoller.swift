@@ -18,12 +18,12 @@ class AddListViewContoller: UIViewController, UITextFieldDelegate {
             try ToDoListsCoreDataManager.shared.createList(name: AddTextField.text ?? "Error")
         }
         catch {
-            _presentAlert()
+            presentAlert()
         }
         _ = navigationController?.popViewController(animated: true)
     }
     
-    private func _presentAlert() {
+    private func presentAlert() {
         let alert = UIAlertController(title: "Incorrect list name".localized(), message: "List name must be unique and contain from 1 to 20 symbols".localized(), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true, completion: nil)

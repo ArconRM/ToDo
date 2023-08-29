@@ -159,7 +159,7 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let item = _listItems[indexPath.row]
-        var image = item.isDone ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "circle")
+        let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "circle")
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, HH:mm"

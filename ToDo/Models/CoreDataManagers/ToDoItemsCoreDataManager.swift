@@ -32,7 +32,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     
     public func fetchCompletedToDoItems() -> [ToDoItem] {
         do {
-            var allItems = try _context.fetch(ToDoItem.fetchRequest())
+            let allItems = try _context.fetch(ToDoItem.fetchRequest())
             return allItems.filter({ $0.isDone })
         } catch {
             fatalError("Error fetching ToDo items")
@@ -41,7 +41,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     
     public func fetchUncompletedToDoItems() -> [ToDoItem] {
         do {
-            var allItems = try _context.fetch(ToDoItem.fetchRequest())
+            let allItems = try _context.fetch(ToDoItem.fetchRequest())
             return allItems.filter({ !$0.isDone })
         } catch {
             fatalError("Error fetching ToDo items")
@@ -65,7 +65,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     
     func createToDoItemWithDate(text: String, date: Date, list: ToDoList, notificationCenter: UNUserNotificationCenter) throws {
         if text == "" {
-            throw InputErrors.emptyTaskInputError
+            throw InputErrors.emptyTaskError
         } else {
             let newItem = ToDoItem(context: _context)
             let notificationId = UUID()
@@ -78,7 +78,11 @@ public final class ToDoItemsCoreDataManager: NSObject {
             newItem.notificationTitle = list.name
             
             ToDoListsCoreDataManager.shared.addItemToList(item: newItem, to: list)
-            NotificationManager.shared.createNotification(notificationCenter: notificationCenter, title: list.name ?? "Error", body: text, selectedDate: date, id: notificationId)
+            NotificationManager.shared.createNotification(notificationCenter: notificationCenter,
+                                                          title: list.name ?? "Error",
+                                                          body: text,
+                                                          selectedDate: date,
+                                                          id: notificationId)
             
             
             _appDelegate.saveContext()
@@ -87,7 +91,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     
     func createToDoItemWithoutDate(text: String, list: ToDoList, notificationCenter: UNUserNotificationCenter) throws {
         if text == "" {
-            throw InputErrors.emptyTaskInputError
+            throw InputErrors.emptyTaskError
         } else {
             let newItem = ToDoItem(context: _context)
             let notificationId = UUID()
@@ -107,7 +111,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     
     func updateItemTextWithDate(list: ToDoList, item: ToDoItem, newText: String, newDate: Date, notificationCenter: UNUserNotificationCenter) throws {
         if newText == "" {
-            throw InputErrors.emptyTaskInputError
+            throw InputErrors.emptyTaskError
         } else {
             if item.dateToRemind != nil {
                 NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId!.uuidString)
@@ -116,8 +120,13 @@ public final class ToDoItemsCoreDataManager: NSObject {
             item.text = newText
             item.dateToRemind = newDate
             
-            NotificationManager.shared.createNotification(notificationCenter: notificationCenter, title: list.name ?? "Error", body: newText, selectedDate: newDate, id: item.notificationId!)
-            
+            NotificationManager.shared.createNotification(
+                notificationCenter: notificationCenter,
+                title: list.name ?? "Error",
+                body: newText,
+                selectedDate: newDate,
+                id: item.notificationId!
+            )
             
             _appDelegate.saveContext()
         }
@@ -125,7 +134,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     
     func updateItemTextWithoutDate(list: ToDoList, item: ToDoItem, newText: String, notificationCenter: UNUserNotificationCenter) throws {
         if newText == "" {
-            throw InputErrors.emptyTaskInputError
+            throw InputErrors.emptyTaskError
         } else {
             if item.dateToRemind != nil {
                 NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId!.uuidString)

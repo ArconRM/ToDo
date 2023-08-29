@@ -31,7 +31,7 @@ class MainViewController: UIViewController {
         
         allItems = ToDoItemsCoreDataManager.shared.fetchAllToDoItems()
         lists = ToDoListsCoreDataManager.shared.fetchToDoListsWithCompletedListBeingLast()
-        _getTodayItems()
+        getTodayItems()
         
         DispatchQueue.main.async {
             self.TodayTableView.reloadData()
@@ -39,15 +39,15 @@ class MainViewController: UIViewController {
         }
         
         if todayItems.count == 0 {
-            _addNoItemsLabel()
+            addNoItemsLabel()
         }
         
         if lists.count == 0 {
-            _addNoListsLabel()
+            addNoListsLabel()
         }
     }
     
-    private func _getTodayItems() {
+    private func getTodayItems() {
         todayItems = []
         for item in allItems {
             if Calendar.current.dateComponents([.day], from: item.dateToRemind ?? Date.distantPast) == Calendar.current.dateComponents([.day], from: Date.now) && item.isDone == false {
@@ -56,7 +56,7 @@ class MainViewController: UIViewController {
         }
     }
     
-    private func _addNoItemsLabel() {
+    private func addNoItemsLabel() {
         NoItemsLabel.frame = CGRect(x: 10.0, y: TodayTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
         NoItemsLabel.text = "No tasks for today".localized()
         NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
@@ -66,7 +66,7 @@ class MainViewController: UIViewController {
         self.view.addSubview(NoItemsLabel)
     }
     
-    private func _addNoListsLabel() {
+    private func addNoListsLabel() {
         NoListsLabel.frame = CGRect(x: 10.0, y: ListsTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
         NoListsLabel.text = "You have no lists".localized()
         NoListsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
@@ -78,6 +78,8 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        ToDoListsCoreDataManager.shared.createCompletedListIfFirstLaunch()
         
         _configure()
     }

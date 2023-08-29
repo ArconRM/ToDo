@@ -32,10 +32,9 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureRightBarButton()
-        
         fetchData()
         
+        configureRightBarButton()
         configureSubviews()
         
         view.addGradientBackground()
