@@ -12,7 +12,6 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     
     @IBOutlet weak var ViewHeader: UIView!
     
-    private let cellId = "ToDoItem"
     private var allItems = [ToDoItem]()
     private var lists = [ToDoList]()
     private var showCompletedKey = "showCompletedItems"
@@ -25,17 +24,17 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
     private var contentView = UIView()
     private var stackView = UIStackView()
     
-    private var listItemsTableView: UITableView?
-    private var rightBarButton: UIBarButtonItem?
+    private var ListItemsTableView: UITableView?
+    private var RightBarButton: UIBarButtonItem?
     
     private var tableViews = [UITableView]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchData()
-        
         configureRightBarButton()
+        
+        fetchData()
         
         configureSubviews()
         
@@ -58,12 +57,14 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             self.ShowOrHideCompletedItemsPressed()
         }
         
-        let actions = [UIAction(title: "Hide completed".localized(), image: UIImage(systemName: "eye"), state: .off, handler: menuClosure)]
+        let actions = UserDefaults.standard.bool(forKey: showCompletedKey) ?
+        [UIAction(title: "Hide completed".localized(), image: UIImage(systemName: "eye"), state: .off, handler: menuClosure)] :
+        [UIAction(title: "Show completed".localized(), image: UIImage(systemName: "eye.fill"), state: .off, handler: menuClosure)]
         
         let menu = UIMenu(title: "",  children: actions)
-        rightBarButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)
+        RightBarButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)
         
-        self.navigationItem.rightBarButtonItem = rightBarButton
+        self.navigationItem.rightBarButtonItem = RightBarButton
     }
     
     private func ShowOrHideCompletedItemsPressed() {
@@ -73,12 +74,12 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             self.ShowOrHideCompletedItemsPressed()
         }
         if UserDefaults.standard.bool(forKey: showCompletedKey) {
-            rightBarButton?.menu = UIMenu(children: [
+            RightBarButton?.menu = UIMenu(children: [
                 UIAction(title: "Hide completed".localized(), image: UIImage(systemName: "eye"), state: .off, handler: menuClosure)
             ])
             
         } else {
-            rightBarButton?.menu = UIMenu(children: [
+            RightBarButton?.menu = UIMenu(children: [
                 UIAction(title: "Show completed".localized(), image: UIImage(systemName: "eye.fill"), state: .off, handler: menuClosure)
             ])
         }
@@ -128,8 +129,8 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             let label = configureLabel(text: list.name!)
             stackView.addArrangedSubview(label)
             
-            listItemsTableView = configureTableView(list: list)
-            stackView.addArrangedSubview(listItemsTableView!)
+            ListItemsTableView = configureTableView(list: list)
+            stackView.addArrangedSubview(ListItemsTableView!)
         }
         
         func configureLabel(text: String) -> UILabel {
@@ -153,7 +154,8 @@ class AllItemsViewController: UIViewController, UITextFieldDelegate, UIScrollVie
             tableView.rowHeight = 80
             tableView.isScrollEnabled = false
             
-            tableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: cellId)
+            tableView.register(UINib(nibName: "ToDoItemWithDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithDateCellId.rawValue)
+            tableView.register(UINib(nibName: "ToDoItemWithoutDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue)
             
             tableViews.append(tableView )
             
@@ -212,12 +214,21 @@ extension AllItemsViewController: UITableViewDelegate, UITableViewDataSource {
         dateFormatter.dateFormat = "MMM d, HH:mm"
         dateFormatter.timeZone = TimeZone.current
         
-        let cell: ToDoTableViewCell = self.listItemsTableView!.dequeueReusableCell(withIdentifier: cellId) as! ToDoTableViewCell
-        
-        cell.ToDoItemLabel.text = item.text
-        cell.DoneButton.setBackgroundImage(image, for: .normal)
-        cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
-        cell.item = item
+        var cell = UITableViewCell()
+        if item.dateToRemind != nil {
+            let cellWithDate = self.ListItemsTableView!.dequeueReusableCell(withIdentifier: TableViewCellIds.itemWithDateCellId.rawValue) as! ToDoItemWithDateTableViewCell
+            cellWithDate.ToDoItemLabel.text = item.text
+            cellWithDate.DoneButton.setBackgroundImage(image, for: .normal)
+            cellWithDate.item = item
+            cellWithDate.DateLabel.text = dateFormatter.string(from: item.dateToRemind!)
+            cell = cellWithDate
+        } else {
+            let cellWithoutDate = self.ListItemsTableView!.dequeueReusableCell(withIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue) as! ToDoItemWithoutDateTableViewCell
+            cellWithoutDate.ToDoItemLabel.text = item.text
+            cellWithoutDate.DoneButton.setBackgroundImage(image, for: .normal)
+            cellWithoutDate.item = item
+            cell = cellWithoutDate
+        }
         
         let cellSize = CGSize(width: UIScreen.main.bounds.width - 25, height: cell.bounds.height)
         

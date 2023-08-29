@@ -16,7 +16,6 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     
     private var _lists = [ToDoList]()
     private var _listItems = [ToDoItem]()
-    private let _cellId = "ToDoItem"
     private let notificationCenter = UNUserNotificationCenter.current()
     
     var selectedList = ToDoList()
@@ -75,7 +74,8 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
         ListNameTextField.text = selectedList.name
         ListNameTextField.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 44.0)
         
-        ItemsTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: _cellId)
+        ItemsTableView.register(UINib(nibName: "ToDoItemWithDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithDateCellId.rawValue)
+        ItemsTableView.register(UINib(nibName: "ToDoItemWithoutDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue)
         
         ItemsTableView.delegate = self
         ItemsTableView.dataSource = self
@@ -114,7 +114,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
             try ToDoListsCoreDataManager.shared.updateListName(list: selectedList, newName: sender.text ?? "Error")
         }
         catch {
-            _presentIncorrectListAlert()
+            presentIncorrectListAlert()
         }
     }
     
@@ -126,20 +126,15 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
         } else {
             let alert = UIAlertController(title: "Are you sure?".localized(), message: "You are going to delete this list.".localized(), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Delete".localized(), style: .destructive, handler: { action in
-//                do {
-                    ToDoListsCoreDataManager.shared.deleteList(self.selectedList)
-                    let _ = self.navigationController?.popToRootViewController(animated: true)
-//                }
-//                catch {
-//                    fatalError("Error deleting list and it's items.")
-//                }
+                ToDoListsCoreDataManager.shared.deleteList(self.selectedList)
+                let _ = self.navigationController?.popToRootViewController(animated: true)
             }))
             alert.addAction(UIAlertAction(title: "No".localized(), style: .cancel))
             self.present(alert, animated: true, completion: nil)
         }
     }
     
-    private func _presentIncorrectListAlert() {
+    private func presentIncorrectListAlert() {
         let alert = UIAlertController(title: "Incorrect list name".localized(), message: "List name must be unique and contain from 1 to 20 symbols.".localized(), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK".localized(), style: .default))
         self.present(alert, animated: true, completion: nil)
@@ -164,18 +159,27 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let item = _listItems[indexPath.row]
-        let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
+        var image = item.isDone ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "circle")
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, HH:mm"
         dateFormatter.timeZone = TimeZone.current
         
-        let cell: ToDoTableViewCell = self.ItemsTableView!.dequeueReusableCell(withIdentifier: _cellId) as! ToDoTableViewCell
-        
-        cell.ToDoItemLabel.text = item.text
-        cell.DoneButton.setBackgroundImage(image, for: .normal)
-        cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
-        cell.item = item
+        var cell = UITableViewCell()
+        if item.dateToRemind != nil {
+            let cellWithDate = self.ItemsTableView!.dequeueReusableCell(withIdentifier: TableViewCellIds.itemWithDateCellId.rawValue) as! ToDoItemWithDateTableViewCell
+            cellWithDate.ToDoItemLabel.text = item.text
+            cellWithDate.DoneButton.setBackgroundImage(image, for: .normal)
+            cellWithDate.item = item
+            cellWithDate.DateLabel.text = dateFormatter.string(from: item.dateToRemind!)
+            cell = cellWithDate
+        } else {
+            let cellWithoutDate = self.ItemsTableView!.dequeueReusableCell(withIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue) as! ToDoItemWithoutDateTableViewCell
+            cellWithoutDate.ToDoItemLabel.text = item.text
+            cellWithoutDate.DoneButton.setBackgroundImage(image, for: .normal)
+            cellWithoutDate.item = item
+            cell = cellWithoutDate
+        }
         
         let cellSize = CGSize(width: UIScreen.main.bounds.width - 30, height: cell.bounds.height)
         

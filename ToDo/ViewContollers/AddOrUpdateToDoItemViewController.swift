@@ -17,8 +17,8 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         case update = "Update"
     }
     
-    private var _selectedDate = Date.now
-    private var _notificationId = UUID()
+    private var selectedDate: Date?
+    private var isSetToRemind = true
     
     var selectedItem = ToDoItem()
     var selectedList = ToDoList()
@@ -27,8 +27,33 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
     private let notificationCenter = UNUserNotificationCenter.current()
     
     @IBOutlet weak var ToDoItemTextField: UITextField!
+    @IBOutlet weak var RemindSwitch: UISwitch!
     @IBOutlet weak var ActionButton: UIButton!
     @IBOutlet weak var DatePickerView: UIDatePicker!
+    @IBOutlet weak var DateToRemindLabel: UILabel!
+    
+    @IBAction func RemindSwitchChanged(_ sender: UISwitch) {
+        isSetToRemind.toggle()
+        if isSetToRemind {
+            UIView.transition(with: DatePickerView, duration: 0.35,
+                              options: .transitionCrossDissolve,
+                              animations: {
+                                 self.DatePickerView.isHidden = false
+                                 self.DateToRemindLabel.isHidden = false
+                              })
+        } else {
+            UIView.transition(with: DatePickerView, duration: 0.35,
+                              options: .transitionCrossDissolve,
+                              animations: {
+                                 self.DatePickerView.isHidden = true
+                                 self.DateToRemindLabel.isHidden = true
+                              })
+        }
+    }
+    
+    @IBAction func DidSelectDate(_ sender: UIDatePicker) {
+        selectedDate = sender.date
+    }
     
     @IBAction func ButtonPressed(_ sender: UIButton) {
         ActionButton.setTitle(functionOfView.rawValue.localized(), for: .normal)
@@ -36,7 +61,15 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         switch functionOfView {
         case .create:
             do {
-                try ToDoItemsCoreDataManager.shared.createToDoItem(text: ToDoItemTextField.text ?? "Error", date: _selectedDate, list: selectedList, notificationCenter: notificationCenter, notificationId: _notificationId)
+                if isSetToRemind {
+                    try ToDoItemsCoreDataManager.shared.createToDoItemWithDate(
+                        text: ToDoItemTextField.text ?? "Error",
+                        date: (selectedDate ?? selectedItem.dateToRemind) ?? Date.now, // if date wasn't selected and item has date, date isn't changing, if item doesn't have date, setting default date
+                        list: selectedList,
+                        notificationCenter: notificationCenter)
+                } else {
+                    try ToDoItemsCoreDataManager.shared.createToDoItemWithoutDate(text: ToDoItemTextField.text ?? "Error", list: selectedList, notificationCenter: notificationCenter)
+                }
             }
             catch InputErrors.emptyTaskInputError {
                 let alert = UIAlertController(title: "Incorrect task".localized(), message: "It can't be empty".localized(), preferredStyle: .alert)
@@ -48,9 +81,19 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true, completion: nil)
             }
+            
         case .update:
             do {
-                try ToDoItemsCoreDataManager.shared.updateItem(list: selectedList, item: selectedItem, newText: ToDoItemTextField.text ?? "Error", newDate: _selectedDate, notificationCenter: notificationCenter, notificationId: _notificationId)
+                if isSetToRemind {
+                    try ToDoItemsCoreDataManager.shared.updateItemTextWithDate(
+                        list: selectedList,
+                        item: selectedItem,
+                        newText: ToDoItemTextField.text ?? "Error",
+                        newDate: (selectedDate ?? selectedItem.dateToRemind) ?? Date.now,
+                        notificationCenter: notificationCenter)
+                } else {
+                    try ToDoItemsCoreDataManager.shared.updateItemTextWithoutDate(list: selectedList, item: selectedItem, newText: ToDoItemTextField.text ?? "Error", notificationCenter: notificationCenter)
+                }
             }
             catch InputErrors.emptyTaskInputError {
                 let alert = UIAlertController(title: "Incorrect task".localized(), message: "It can't be empty".localized(), preferredStyle: .alert)
@@ -62,15 +105,12 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true, completion: nil)
             }
+            
         default:
             return
         }
         
         _ = navigationController?.popViewController(animated: true)
-    }
-    
-    @IBAction func DidSelectDate(_ sender: UIDatePicker) {
-        _selectedDate = sender.date
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -84,7 +124,6 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         _configure()
     }
     
@@ -102,7 +141,12 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         
         if functionOfView == .update {
             ToDoItemTextField.text = selectedItem.text
-            DatePickerView.date = selectedItem.dateToRemind ?? Date.now
+            if selectedItem.dateToRemind != nil {
+                DatePickerView.date = selectedItem.dateToRemind!
+            } else {
+                RemindSwitch.isOn = false
+                DatePickerView.removeFromSuperview()
+            }
         }
         
         ActionButton.setTitle(functionOfView.rawValue.localized(), for: .normal)

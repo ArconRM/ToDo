@@ -1,31 +1,28 @@
 //
-//  AllItemsTableViewCell.swift
+//  ToDoItemWithoutDateTableViewCell.swift
 //  ToDo
 //
-//  Created by Aaron on 24.08.2022.
+//  Created by Артемий on 26.08.2023.
 //
 
 import UIKit
 
-class ToDoTableViewCell: UITableViewCell {
+class ToDoItemWithoutDateTableViewCell: UITableViewCell {
     
     var item = ToDoItem()
     private let notificationCenter = UNUserNotificationCenter.current()
     
     @IBOutlet weak var DoneButton: UIButton!
     @IBOutlet weak var ToDoItemLabel: UILabel!
-    @IBOutlet weak var DateLabel: UILabel!
-    
-    @IBOutlet weak var Item: UIView!
     
     @IBAction func DoneButtonPressed(_ sender: UIButton) {
-        
         ToDoItemsCoreDataManager.shared.toggleItemIsDoneStatus(item: item, notificationCenter: notificationCenter)
         
         let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "circle")
         
         DoneButton.setBackgroundImage(image, for: .normal)
     }
+    
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -51,10 +48,10 @@ class ToDoTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
     }
-    
+
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
+
         // Configure the view for the selected state
     }
     

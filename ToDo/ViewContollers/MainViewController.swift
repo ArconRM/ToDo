@@ -17,8 +17,6 @@ class MainViewController: UIViewController {
     private var allItems = [ToDoItem]()
     private var lists = [ToDoList]()
     
-    private let todayTableViewIdCell = "ToDoItem"
-    private let listsTableViewIdCell = "ListCell"
     private var selectedList = ToDoList()
     
     private let NoItemsLabel = UILabel.init()
@@ -85,8 +83,10 @@ class MainViewController: UIViewController {
     }
     
     private func _configure() {
-        TodayTableView.register(UINib(nibName: "ToDoTableViewCell", bundle: nil), forCellReuseIdentifier: todayTableViewIdCell)
-        ListsTableView.register(UINib(nibName: "ListTableViewCell", bundle: nil), forCellReuseIdentifier: listsTableViewIdCell)
+        TodayTableView.register(UINib(nibName: "ToDoItemWithDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithDateCellId.rawValue)
+        TodayTableView.register(UINib(nibName: "ToDoItemWithoutDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue)
+        
+        ListsTableView.register(UINib(nibName: "ListTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.listCellId.rawValue)
         
         TodayTableView.delegate = self
         ListsTableView.delegate = self
@@ -155,13 +155,23 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             dateFormatter.dateFormat = "MMM d, HH:mm"
             dateFormatter.timeZone = TimeZone.current
             
-            let cell: ToDoTableViewCell = self.TodayTableView!.dequeueReusableCell(withIdentifier: todayTableViewIdCell) as! ToDoTableViewCell
-            cell.ToDoItemLabel.text = item.text
-            cell.DoneButton.setBackgroundImage(image, for: .normal)
-            cell.DateLabel.text = dateFormatter.string(from: item.dateToRemind ?? Date.now)
-            cell.item = item
+            var cell = UITableViewCell()
+            if item.dateToRemind != nil {
+                let cellWithDate = self.TodayTableView!.dequeueReusableCell(withIdentifier: TableViewCellIds.itemWithDateCellId.rawValue) as! ToDoItemWithDateTableViewCell
+                cellWithDate.ToDoItemLabel.text = item.text
+                cellWithDate.DoneButton.setBackgroundImage(image, for: .normal)
+                cellWithDate.item = item
+                cellWithDate.DateLabel.text = dateFormatter.string(from: item.dateToRemind!)
+                cell = cellWithDate
+            } else {
+                let cellWithoutDate = self.TodayTableView!.dequeueReusableCell(withIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue) as! ToDoItemWithoutDateTableViewCell
+                cellWithoutDate.ToDoItemLabel.text = item.text
+                cellWithoutDate.DoneButton.setBackgroundImage(image, for: .normal)
+                cellWithoutDate.item = item
+                cell = cellWithoutDate
+            }
             
-            let cellSize = CGSize(width: UIScreen.main.bounds.width - 35, height: cell.bounds.height - 0.3) 
+            let cellSize = CGSize(width: UIScreen.main.bounds.width - 35, height: cell.bounds.height - 0.3)
             
             let maskPath = UIBezierPath(roundedRect: CGRect(origin: cell.bounds.origin, size: cellSize), byRoundingCorners: [.topLeft, .topRight, .bottomRight, .bottomLeft], cornerRadii: CGSize(width: 15, height: 15))
             
@@ -176,7 +186,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             
             let list = lists[indexPath.row]
             
-            let cell: ListTableViewCell = self.ListsTableView.dequeueReusableCell(withIdentifier: listsTableViewIdCell) as! ListTableViewCell
+            let cell: ListTableViewCell = self.ListsTableView.dequeueReusableCell(withIdentifier: TableViewCellIds.listCellId.rawValue) as! ListTableViewCell
             cell.ListNameLabel?.text = list.name
             
             if ToDoListsCoreDataManager.shared.checkIfListIsCompleted(list) {
