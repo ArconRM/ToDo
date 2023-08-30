@@ -46,7 +46,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
     private func _addNoItemsLabel() {
         NoItemsLabel.frame = CGRect(x: 10.0, y: self.view.frame.height / 2, width: self.view.frame.width - 20.0, height: 50)
         NoItemsLabel.text = "No tasks here :(".localized()
-        NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
+        NoItemsLabel.font = .systemFont(ofSize: 25, weight: .bold)
         NoItemsLabel.textAlignment = .center
         NoItemsLabel.textColor = .label
         self.view.addSubview(NoItemsLabel)
@@ -72,7 +72,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
         
         ListNameTextField.delegate = self
         ListNameTextField.text = selectedList.name
-        ListNameTextField.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 44.0)
+        NoItemsLabel.font = .systemFont(ofSize: 44, weight: .bold)
         
         ItemsTableView.register(UINib(nibName: "ToDoItemWithDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithDateCellId.rawValue)
         ItemsTableView.register(UINib(nibName: "ToDoItemWithoutDateTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIds.itemWithoutDateCellId.rawValue)
@@ -83,7 +83,7 @@ class ListItemsViewController: UIViewController, UITextFieldDelegate {
         if ToDoListsCoreDataManager.shared.checkIfListIsCompleted(selectedList) {
             AddButton.removeFromSuperview()
         }
-        AddButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 20.0)
+        NoItemsLabel.font = .systemFont(ofSize: 20, weight: .bold)
         AddButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
     }
     

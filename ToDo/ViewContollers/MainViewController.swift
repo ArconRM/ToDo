@@ -59,7 +59,7 @@ class MainViewController: UIViewController {
     private func addNoItemsLabel() {
         NoItemsLabel.frame = CGRect(x: 10.0, y: TodayTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
         NoItemsLabel.text = "No tasks for today".localized()
-        NoItemsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
+        NoItemsLabel.font = .systemFont(ofSize: 25, weight: .bold)
         NoItemsLabel.textAlignment = .center
         NoItemsLabel.textColor = .label
         NoItemsLabel.numberOfLines = 2
@@ -69,7 +69,7 @@ class MainViewController: UIViewController {
     private func addNoListsLabel() {
         NoListsLabel.frame = CGRect(x: 10.0, y: ListsTableView.layer.position.y - 25, width: self.view.frame.width - 20.0, height: 50)
         NoListsLabel.text = "You have no lists".localized()
-        NoListsLabel.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 25.0)
+        NoItemsLabel.font = .systemFont(ofSize: 25, weight: .bold)
         NoListsLabel.textAlignment = .center
         NoListsLabel.textColor = .label
         NoListsLabel.numberOfLines = 2

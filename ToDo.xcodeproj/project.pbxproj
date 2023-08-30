@@ -31,7 +31,6 @@
 		BA3786942A87D2DE001B4316 /* ToDoListsCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA3786932A87D2DE001B4316 /* ToDoListsCoreDataManager.swift */; };
 		BA57172C296AF83A006809EB /* Extension+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA57172B296AF83A006809EB /* Extension+String.swift */; };
 		BA57172F296AF8A3006809EB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BA571731296AF8A3006809EB /* Localizable.strings */; };
-		BA611368296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = BA611367296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf */; };
 		BA7A604F2A87E2A400C9EED9 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A604E2A87E2A400C9EED9 /* NotificationManager.swift */; };
 		BA94FDE22A78107100775C94 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA94FDE12A78107100775C94 /* SettingsViewController.swift */; };
 		BAE2F7AA2A828A1B00ED46C1 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE2F7A92A828A1B00ED46C1 /* UIViewExtensions.swift */; };
@@ -69,7 +68,6 @@
 		BA57172B296AF83A006809EB /* Extension+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+String.swift"; sourceTree = "<group>"; };
 		BA571730296AF8A3006809EB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		BA571732296AF8A6006809EB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		BA611367296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = arialroundedmtprocyr_bold.otf; path = "../../../../../Downloads/Arial Rounded MT Pro Cyr/arialroundedmtprocyr_bold.otf"; sourceTree = "<group>"; };
 		BA7A604E2A87E2A400C9EED9 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		BA94FDE12A78107100775C94 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		BAE2F7A92A828A1B00ED46C1 /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
@@ -110,7 +108,6 @@
 			isa = PBXGroup;
 			children = (
 				BAE2F7A82A82486A00ED46C1 /* Extensions */,
-				BA611366296AE12D00DB16B9 /* Fonts */,
 				939E968C28A68B1D00C4AC3E /* Views */,
 				939E968B28A68B1300C4AC3E /* ViewContollers */,
 				939E968A28A68B0B00C4AC3E /* Models */,
@@ -170,14 +167,6 @@
 				BA06EF48295B2C6100E13980 /* ListTableViewCell.xib */,
 			);
 			path = Cells;
-			sourceTree = "<group>";
-		};
-		BA611366296AE12D00DB16B9 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-				BA611367296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf */,
-			);
-			path = Fonts;
 			sourceTree = "<group>";
 		};
 		BA7A604C2A87E27300C9EED9 /* CoreDataManagers */ = {
@@ -267,7 +256,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BA611368296AE15300DB16B9 /* arialroundedmtprocyr_bold.otf in Resources */,
 				93FA0ACC28B6B29600CE7C2D /* ToDoItemWithDateTableViewCell.xib in Resources */,
 				931D868328A66992001885BE /* LaunchScreen.storyboard in Resources */,
 				BA57172F296AF8A3006809EB /* Localizable.strings in Resources */,
