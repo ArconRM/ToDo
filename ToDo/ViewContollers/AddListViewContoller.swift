@@ -44,7 +44,7 @@ class AddListViewContoller: UIViewController, UITextFieldDelegate {
             string: "Enter list name".localized(),
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.darkGray])
         
-        CreateButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 24.0)
+        CreateButton.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
         CreateButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
     }
     

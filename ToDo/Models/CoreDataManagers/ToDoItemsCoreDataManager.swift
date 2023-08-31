@@ -48,12 +48,6 @@ public final class ToDoItemsCoreDataManager: NSObject {
         }
     }
     
-    //    public func getToDoItemsByLists() {
-    //        for list in ToDoItemsCoreDataManager.lists {
-    //            CoreDataManager.itemsByLists.append(list.items?.allObjects as! [ToDoItem])
-    //        }
-    //    }
-    
     func deleteToDoItem(item: ToDoItem, list: ToDoList, notificationCenter: UNUserNotificationCenter) {
         _context.delete(item)
         NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId?.uuidString ?? "")
@@ -139,7 +133,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
             if item.dateToRemind != nil {
                 NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId!.uuidString)
             }
-            
+            item.dateToRemind = nil
             item.text = newText
             
             _appDelegate.saveContext()

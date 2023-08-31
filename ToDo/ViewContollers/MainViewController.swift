@@ -95,7 +95,7 @@ class MainViewController: UIViewController {
         TodayTableView.dataSource = self
         ListsTableView.dataSource = self
         
-        CreateListButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 20.0)
+        CreateListButton.titleLabel?.font = .systemFont(ofSize: 20, weight: .bold)
         CreateListButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
     }
     

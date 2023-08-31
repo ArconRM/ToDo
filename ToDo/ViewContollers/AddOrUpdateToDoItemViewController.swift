@@ -17,24 +17,25 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         case update = "Update"
     }
     
-    private let _notificationCenter = UNUserNotificationCenter.current()
-    
-    private var _selectedDate: Date?
-    private var _isSetToRemind = true
-    
-    var selectedItem = ToDoItem()
-    var selectedList = ToDoList()
-    var functionOfView = FunctionOfView.unknown
-    
     @IBOutlet weak var ToDoItemTextField: UITextField!
     @IBOutlet weak var RemindSwitch: UISwitch!
     @IBOutlet weak var ActionButton: UIButton!
     @IBOutlet weak var DatePickerView: UIDatePicker!
     @IBOutlet weak var DateToRemindLabel: UILabel!
     
+    private let _notificationCenter = UNUserNotificationCenter.current()
+    
+    private var _selectedDate: Date?
+    private var isSetToRemind: Bool!
+    
+    var selectedItem = ToDoItem()
+    var selectedList = ToDoList()
+    var functionOfView = FunctionOfView.unknown
+    
     @IBAction func RemindSwitchChanged(_ sender: UISwitch) {
-        _isSetToRemind.toggle()
-        if _isSetToRemind {
+        isSetToRemind.toggle()
+        
+        if isSetToRemind {
             UIView.transition(with: DatePickerView, duration: 0.35,
                               options: .transitionCrossDissolve,
                               animations: {
@@ -56,14 +57,13 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func ButtonPressed(_ sender: UIButton) {
-        ActionButton.setTitle(functionOfView.rawValue.localized(), for: .normal)
-        
         switch functionOfView {
         case .create:
             do {
-                if _isSetToRemind {
+                if isSetToRemind {
                     try ToDoItemsCoreDataManager.shared.createToDoItemWithDate(text: ToDoItemTextField.text ?? "Error",
-                                                                               date: (_selectedDate ?? selectedItem.dateToRemind) ?? Date.now, // if date wasn't selected and item has date, date isn't changing, if date wasn't selected and item doesn't have date, setting default date
+                                                                               date: (_selectedDate ?? selectedItem.dateToRemind) ?? Date.now,
+                                                                               // if date wasn't selected and item has date, date isn't changing, if date wasn't selected and item doesn't have date, setting default date
                                                                                list: selectedList,
                                                                                notificationCenter: _notificationCenter)
                 } else {
@@ -85,7 +85,7 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
             
         case .update:
             do {
-                if _isSetToRemind {
+                if isSetToRemind {
                     try ToDoItemsCoreDataManager.shared.updateItemTextWithDate(list: selectedList,
                                                                                item: selectedItem,
                                                                                newText: ToDoItemTextField.text ?? "Error",
@@ -116,21 +116,12 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         _ = navigationController?.popViewController(animated: true)
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        ToDoItemTextField.resignFirstResponder()
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        ToDoItemTextField.resignFirstResponder()
-        return true
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        _configure()
+        configure()
     }
     
-    private func _configure() {
+    private func configure() {
         view.addGradientBackground()
         view.addBlurEffect()
         
@@ -145,15 +136,22 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         if functionOfView == .update {
             ToDoItemTextField.text = selectedItem.text
             if selectedItem.dateToRemind != nil {
+                RemindSwitch.isOn = true
                 DatePickerView.date = selectedItem.dateToRemind!
+                isSetToRemind = true
             } else {
                 RemindSwitch.isOn = false
-                DatePickerView.removeFromSuperview()
+                isSetToRemind = false
             }
+            DatePickerView.isHidden = !isSetToRemind
+            DateToRemindLabel.isHidden = !isSetToRemind
+        } else {
+            DatePickerView.isHidden = true
+            DateToRemindLabel.isHidden = true
         }
         
         ActionButton.setTitle(functionOfView.rawValue.localized(), for: .normal)
-        ActionButton.titleLabel?.font = UIFont(name:"Arial Rounded MT Pro Cyr", size: 24.0)
+        ActionButton.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
         ActionButton.contentEdgeInsets = UIEdgeInsets(top: 3.0, left: 0.0, bottom: 0.0, right: 0.0)
         
         _notificationCenter.requestAuthorization(options: [.alert, .sound]) { (permissionGranted, error) in
@@ -162,5 +160,14 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
                 print("Permission Denied")
             }
         }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        ToDoItemTextField.resignFirstResponder()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        ToDoItemTextField.resignFirstResponder()
+        return true
     }
 }
