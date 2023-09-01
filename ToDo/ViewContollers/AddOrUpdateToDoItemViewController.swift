@@ -86,16 +86,15 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
         case .update:
             do {
                 if isSetToRemind {
-                    try ToDoItemsCoreDataManager.shared.updateItemTextWithDate(list: selectedList,
-                                                                               item: selectedItem,
-                                                                               newText: ToDoItemTextField.text ?? "Error",
-                                                                               newDate: (_selectedDate ?? selectedItem.dateToRemind) ?? Date.now,
-                                                                               notificationCenter: _notificationCenter)
+                    try ToDoItemsCoreDataManager.shared.updateItemTextWithUpdatingDate(item: selectedItem,
+                                                                                       newText: ToDoItemTextField.text ?? "Error",
+                                                                                       newDate: (_selectedDate ?? selectedItem.dateToRemind) ?? Date.now,
+                                                                                       listName: selectedList.name ?? "Error",
+                                                                                       notificationCenter: _notificationCenter)
                 } else {
-                    try ToDoItemsCoreDataManager.shared.updateItemTextWithoutDate(list: selectedList,
-                                                                                  item: selectedItem,
-                                                                                  newText: ToDoItemTextField.text ?? "Error",
-                                                                                  notificationCenter: _notificationCenter)
+                    try ToDoItemsCoreDataManager.shared.updateItemTextWithoutUpdatingDate(item: selectedItem,
+                                                                                          newText: ToDoItemTextField.text ?? "Error",
+                                                                                          notificationCenter: _notificationCenter)
                 }
             }
             catch InputErrors.emptyTaskError {
@@ -143,12 +142,13 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
                 RemindSwitch.isOn = false
                 isSetToRemind = false
             }
-            DatePickerView.isHidden = !isSetToRemind
-            DateToRemindLabel.isHidden = !isSetToRemind
         } else {
-            DatePickerView.isHidden = true
-            DateToRemindLabel.isHidden = true
+            RemindSwitch.isOn = false
+            isSetToRemind = false
         }
+        
+        DatePickerView.isHidden = !isSetToRemind
+        DateToRemindLabel.isHidden = !isSetToRemind
         
         ActionButton.setTitle(functionOfView.rawValue.localized(), for: .normal)
         ActionButton.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)

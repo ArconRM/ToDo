@@ -32,6 +32,8 @@
 		BA57172C296AF83A006809EB /* Extension+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA57172B296AF83A006809EB /* Extension+String.swift */; };
 		BA57172F296AF8A3006809EB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BA571731296AF8A3006809EB /* Localizable.strings */; };
 		BA7A604F2A87E2A400C9EED9 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A604E2A87E2A400C9EED9 /* NotificationManager.swift */; };
+		BA83646D2AA23059008F3423 /* UNNotificationActionIds.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA83646C2AA23059008F3423 /* UNNotificationActionIds.swift */; };
+		BA83646F2AA230B1008F3423 /* UNNotificationCategoryIds.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA83646E2AA230B1008F3423 /* UNNotificationCategoryIds.swift */; };
 		BA94FDE22A78107100775C94 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA94FDE12A78107100775C94 /* SettingsViewController.swift */; };
 		BAE2F7AA2A828A1B00ED46C1 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE2F7A92A828A1B00ED46C1 /* UIViewExtensions.swift */; };
 		BAE2F7AC2A828A8C00ED46C1 /* CAGradientLayerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE2F7AB2A828A8C00ED46C1 /* CAGradientLayerExtensions.swift */; };
@@ -69,6 +71,8 @@
 		BA571730296AF8A3006809EB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		BA571732296AF8A6006809EB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		BA7A604E2A87E2A400C9EED9 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		BA83646C2AA23059008F3423 /* UNNotificationActionIds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UNNotificationActionIds.swift; sourceTree = "<group>"; };
+		BA83646E2AA230B1008F3423 /* UNNotificationCategoryIds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UNNotificationCategoryIds.swift; sourceTree = "<group>"; };
 		BA94FDE12A78107100775C94 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		BAE2F7A92A828A1B00ED46C1 /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		BAE2F7AB2A828A8C00ED46C1 /* CAGradientLayerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAGradientLayerExtensions.swift; sourceTree = "<group>"; };
@@ -107,6 +111,7 @@
 		931D867228A6698E001885BE /* ToDo */ = {
 			isa = PBXGroup;
 			children = (
+				BA7A604C2A87E27300C9EED9 /* CoreDataManagers */,
 				BAE2F7A82A82486A00ED46C1 /* Extensions */,
 				939E968C28A68B1D00C4AC3E /* Views */,
 				939E968B28A68B1300C4AC3E /* ViewContollers */,
@@ -123,12 +128,13 @@
 		939E968A28A68B0B00C4AC3E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				BA7A604C2A87E27300C9EED9 /* CoreDataManagers */,
 				BAE2F7B72A8290C900ED46C1 /* Errors */,
 				BA7A604E2A87E2A400C9EED9 /* NotificationManager.swift */,
 				939E968D28A68E3000C4AC3E /* ToDoList+CoreDataClass.swift */,
 				939E968628A68ADE00C4AC3E /* ToDoItem+CoreDataClass.swift */,
 				BA08DF4A2A9CF09D001FEB31 /* TableViewCellIds.swift */,
+				BA83646C2AA23059008F3423 /* UNNotificationActionIds.swift */,
+				BA83646E2AA230B1008F3423 /* UNNotificationCategoryIds.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -281,6 +287,7 @@
 				93B33F6928A92938000B15F7 /* AddListViewContoller.swift in Sources */,
 				931D867628A6698E001885BE /* SceneDelegate.swift in Sources */,
 				BAE2F7B92A8290F500ED46C1 /* InputErrors.swift in Sources */,
+				BA83646D2AA23059008F3423 /* UNNotificationActionIds.swift in Sources */,
 				93FA0ACE28B6B75F00CE7C2D /* AllItemsViewController.swift in Sources */,
 				931D911628B564A800989DAB /* AddOrUpdateToDoItemViewController.swift in Sources */,
 				BAE2F7AC2A828A8C00ED46C1 /* CAGradientLayerExtensions.swift in Sources */,
@@ -289,6 +296,7 @@
 				BA94FDE22A78107100775C94 /* SettingsViewController.swift in Sources */,
 				BA57172C296AF83A006809EB /* Extension+String.swift in Sources */,
 				BA08DF4B2A9CF09E001FEB31 /* TableViewCellIds.swift in Sources */,
+				BA83646F2AA230B1008F3423 /* UNNotificationCategoryIds.swift in Sources */,
 				BAE2F7AE2A828AB400ED46C1 /* UserDefaultsExtensions.swift in Sources */,
 				939E968828A68ADE00C4AC3E /* ToDoItem+CoreDataClass.swift in Sources */,
 				93FA0ACB28B6B29600CE7C2D /* ToDoItemWithDateTableViewCell.swift in Sources */,

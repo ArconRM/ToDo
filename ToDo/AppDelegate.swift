@@ -82,5 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    }
 }
 

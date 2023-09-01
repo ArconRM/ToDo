@@ -13,7 +13,9 @@ public final class NotificationManager {
     
     public static var shared = NotificationManager()
     
-    public func createNotification(notificationCenter: UNUserNotificationCenter, title: String, body: String, selectedDate: Date, id: UUID) {
+    public func createNotification(notifId: UUID, title: String, body: String, selectedDate: Date) {
+        let notificationCenter = configureNotificationCenter()
+        
         notificationCenter.getNotificationSettings { (settings) in
             if (settings.authorizationStatus == .authorized) {
                 
@@ -21,20 +23,32 @@ public final class NotificationManager {
                 content.title = title
                 content.body = body
                 content.sound = UNNotificationSound.default
+                content.categoryIdentifier = UNNotificationCategoryIds.SetCompletedCategoryId.rawValue //ToDo: add functionality
                 
                 let date = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: selectedDate)
                 let trigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: false)
                 
-                let request = UNNotificationRequest(identifier: id.uuidString, content: content, trigger: trigger)
+                let request = UNNotificationRequest(identifier: notifId.uuidString, content: content, trigger: trigger)
                 
-                notificationCenter.add(request) { (error) in
-                    if error != nil {
-                        print(error?.localizedDescription ?? "Unknown error")
-                        return
-                    }
-                }
+                notificationCenter.add(request)
             }
         }
+    }
+    
+    private func configureNotificationCenter() -> UNUserNotificationCenter {
+        let notifCenter = UNUserNotificationCenter.current()
+        
+        let setCompletedAction = UNNotificationAction(identifier: UNNotificationActionIds.SetCompletedActionId.rawValue,
+                                                      title: "Set completed".localized(),
+                                                      options: [],
+                                                      icon: UNNotificationActionIcon(systemImageName: "checkmark.circle.fill"))
+        
+        let setCompletedCategory = UNNotificationCategory(identifier: UNNotificationCategoryIds.SetCompletedCategoryId.rawValue,
+                                                          actions: [setCompletedAction],
+                                                          intentIdentifiers: [])
+        
+        notifCenter.setNotificationCategories([setCompletedCategory])
+        return notifCenter
     }
     
     public func deleteNotification(notificationCenter: UNUserNotificationCenter, id: String) {

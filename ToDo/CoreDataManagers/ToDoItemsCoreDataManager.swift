@@ -48,15 +48,6 @@ public final class ToDoItemsCoreDataManager: NSObject {
         }
     }
     
-    func deleteToDoItem(item: ToDoItem, list: ToDoList, notificationCenter: UNUserNotificationCenter) {
-        _context.delete(item)
-        NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId?.uuidString ?? "")
-        
-        ToDoListsCoreDataManager.shared.removeItemFromList(item: item, list: list)
-        
-        _appDelegate.saveContext()
-    }
-    
     func createToDoItemWithDate(text: String, date: Date, list: ToDoList, notificationCenter: UNUserNotificationCenter) throws {
         if text == "" {
             throw InputErrors.emptyTaskError
@@ -72,12 +63,10 @@ public final class ToDoItemsCoreDataManager: NSObject {
             newItem.notificationTitle = list.name
             
             ToDoListsCoreDataManager.shared.addItemToList(item: newItem, to: list)
-            NotificationManager.shared.createNotification(notificationCenter: notificationCenter,
+            NotificationManager.shared.createNotification(notifId: notificationId,
                                                           title: list.name ?? "Error",
                                                           body: text,
-                                                          selectedDate: date,
-                                                          id: notificationId)
-            
+                                                          selectedDate: date)
             
             _appDelegate.saveContext()
         }
@@ -103,7 +92,7 @@ public final class ToDoItemsCoreDataManager: NSObject {
     }
     
     
-    func updateItemTextWithDate(list: ToDoList, item: ToDoItem, newText: String, newDate: Date, notificationCenter: UNUserNotificationCenter) throws {
+    func updateItemTextWithUpdatingDate(item: ToDoItem, newText: String, newDate: Date, listName: String,  notificationCenter: UNUserNotificationCenter) throws {
         if newText == "" {
             throw InputErrors.emptyTaskError
         } else {
@@ -114,24 +103,22 @@ public final class ToDoItemsCoreDataManager: NSObject {
             item.text = newText
             item.dateToRemind = newDate
             
-            NotificationManager.shared.createNotification(
-                notificationCenter: notificationCenter,
-                title: list.name ?? "Error",
-                body: newText,
-                selectedDate: newDate,
-                id: item.notificationId!
-            )
+            NotificationManager.shared.createNotification(notifId: item.notificationId!,
+                                                          title: listName,
+                                                          body: newText,
+                                                          selectedDate: newDate)
             
             _appDelegate.saveContext()
         }
     }
     
-    func updateItemTextWithoutDate(list: ToDoList, item: ToDoItem, newText: String, notificationCenter: UNUserNotificationCenter) throws {
+    func updateItemTextWithoutUpdatingDate(item: ToDoItem, newText: String, notificationCenter: UNUserNotificationCenter) throws {
         if newText == "" {
             throw InputErrors.emptyTaskError
         } else {
             if item.dateToRemind != nil {
-                NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId!.uuidString)
+                NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter,
+                                                              id: item.notificationId!.uuidString)
             }
             item.dateToRemind = nil
             item.text = newText
@@ -145,11 +132,24 @@ public final class ToDoItemsCoreDataManager: NSObject {
         
         if item.dateToRemind != nil {
             if item.isDone {
-                NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId!.uuidString)
+                NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter,
+                                                              id: item.notificationId!.uuidString)
             } else {
-                NotificationManager.shared.createNotification(notificationCenter: notificationCenter, title: item.notificationTitle!, body: item.text!, selectedDate: item.dateToRemind!, id: item.notificationId!)
+                NotificationManager.shared.createNotification(notifId: item.notificationId!,
+                                                              title: item.notificationTitle!,
+                                                              body: item.text!,
+                                                              selectedDate: item.dateToRemind!)
             }
         }
+        
+        _appDelegate.saveContext()
+    }
+    
+    func deleteToDoItem(item: ToDoItem, list: ToDoList, notificationCenter: UNUserNotificationCenter) {
+        _context.delete(item)
+        NotificationManager.shared.deleteNotification(notificationCenter: notificationCenter, id: item.notificationId?.uuidString ?? "")
+        
+        ToDoListsCoreDataManager.shared.removeItemFromList(item: item, list: list)
         
         _appDelegate.saveContext()
     }
