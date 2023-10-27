@@ -15,6 +15,7 @@ public final class ToDoListsCoreDataManager: NSObject {
     public static let shared = ToDoListsCoreDataManager()
     
     private static var completedListIdKey = "CompletedListId"
+    private static var wasAppLaunchedKey = "wasAppLaunched"
     
     private var _appDelegate: AppDelegate {
         UIApplication.shared.delegate as! AppDelegate
@@ -71,10 +72,10 @@ public final class ToDoListsCoreDataManager: NSObject {
     
     private func _isFirstLaunch() -> Bool {
         let defaults = UserDefaults.standard
-        if let _ = defaults.string(forKey: "isAppAlreadyLaunchedOnce") {
+        if let _ = defaults.object(forKey: ToDoListsCoreDataManager.wasAppLaunchedKey) {
             return false
         } else {
-            defaults.set(true, forKey: "isAppAlreadyLaunchedOnce")
+            defaults.set(true, forKey: ToDoListsCoreDataManager.wasAppLaunchedKey)
             return true
         }
     }
@@ -82,7 +83,7 @@ public final class ToDoListsCoreDataManager: NSObject {
     
     public func fetchToDoLists() -> [ToDoList] {
         do {
-            var lists = try _context.fetch(ToDoList.fetchRequest())
+            let lists = try _context.fetch(ToDoList.fetchRequest())
             return lists
         } catch {
             fatalError("Error fetching ToDo lists")
