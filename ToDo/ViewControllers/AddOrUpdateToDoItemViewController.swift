@@ -62,8 +62,7 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
             do {
                 if isSetToRemind {
                     try ToDoItemsCoreDataManager.shared.createToDoItemWithDate(text: ToDoItemTextField.text ?? "Error",
-                                                                               date: (_selectedDate ?? selectedItem.dateToRemind) ?? Date.now,
-                                                                               // if date wasn't selected and item has date, date isn't changing, if date wasn't selected and item doesn't have date, setting default date
+                                                                               date: _selectedDate ?? Date.now,
                                                                                list: selectedList,
                                                                                notificationCenter: _notificationCenter)
                 } else {
@@ -89,6 +88,7 @@ class AddOrUpdateToDoItemViewController: UIViewController, UITextFieldDelegate {
                     try ToDoItemsCoreDataManager.shared.updateItemTextWithUpdatingDate(item: selectedItem,
                                                                                        newText: ToDoItemTextField.text ?? "Error",
                                                                                        newDate: (_selectedDate ?? selectedItem.dateToRemind) ?? Date.now,
+                                                                                       // if date wasn't selected and item has date, date isn't changing, if date wasn't selected and item doesn't have date, setting default date
                                                                                        listName: selectedList.name ?? "Error",
                                                                                        notificationCenter: _notificationCenter)
                 } else {

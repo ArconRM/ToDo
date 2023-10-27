@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class AddListViewContoller: UIViewController, UITextFieldDelegate {
+class AddListViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var AddTextField: UITextField!
     @IBOutlet weak var CreateButton: UIButton!
