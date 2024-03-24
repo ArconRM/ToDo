@@ -154,7 +154,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             let image = item.isDone ?  UIImage(systemName: "checkmark.circle.fill"): UIImage(systemName: "circle")
             
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MMM d, HH:mm"
+            dateFormatter.dateFormat = "d MMM, HH:mm"
             dateFormatter.timeZone = TimeZone.current
             
             var cell = UITableViewCell()
