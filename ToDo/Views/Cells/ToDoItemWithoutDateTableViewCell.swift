@@ -21,6 +21,9 @@ class ToDoItemWithoutDateTableViewCell: UITableViewCell {
         let image = item.isDone ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "circle")
         
         DoneButton.setBackgroundImage(image, for: .normal)
+        
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
     }
     
     

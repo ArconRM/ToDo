@@ -205,6 +205,9 @@ extension ListItemsViewController: UITableViewDelegate, UITableViewDataSource {
                                 self._deleteItemWithTableUpdate(item: self._listItems[indexPath.row])
                             })
             completionHandler(true)
+            
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
         }
         deleteAction.image = UIImage(systemName: "trash.fill")
         let swipeConfiguration = UISwipeActionsConfiguration(actions: [deleteAction])
